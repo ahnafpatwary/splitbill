@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Project Bill Split</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --surface-raised: #121212;
+  --surface-input: #161616;
+  --border: #222222;
+  --border-subtle: #181818;
+  --border-hover: #383838;
+  --text: #ffffff;
+  --text-muted: #a1a1aa;
+  --text-dim: #71717a;
+
+  /* Accent: Refined Crimson */
+  --accent: #e11d48;
+  --accent-soft: rgba(225, 29, 72, 0.08);
+  --accent-border: rgba(225, 29, 72, 0.5);
+
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.5;
+  padding: 2.5rem 1.25rem 5rem;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── App Header ── */
+.app-header {
+  margin-bottom: 2.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.brand-title {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+/* ── Sections ── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.35rem;
+  transition: border-color 0.2s;
+}
+.section:hover {
+  border-color: var(--border-hover);
+}
+.section-header {
+  margin-bottom: 1.2rem;
+}
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  color: #ffffff;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ── Step 1: People ── */
+.people-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+.person-tag {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: border-color 0.2s;
+}
+.person-tag:focus-within {
+  border-color: var(--accent);
+}
+.person-name-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  width: 95px;
+}
+.btn-del-person {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  transition: color 0.15s;
+}
+.btn-del-person:hover:not(:disabled) {
+  color: var(--accent);
+}
+.btn-del-person:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+.btn-add-person {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s;
+}
+.btn-add-person:hover {
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── Step 2: Items ── */
+.items-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.item-row {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  transition: border-color 0.2s;
+}
+.item-row:hover {
+  border-color: var(--border-hover);
+}
+.item-inputs {
+  display: grid;
+  grid-template-columns: 1fr 135px 36px;
+  gap: 0.6rem;
+  align-items: center;
+}
+.input-field {
+  background: var(--surface-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  padding: 0.52rem 0.8rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.input-field:focus {
+  border-color: var(--accent);
+}
+.price-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.currency-symbol {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+.price-box .input-field {
+  padding-left: 1.8rem;
+}
+.btn-del-item {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  height: 38px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.btn-del-item:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+/* Split Pills (Clean outline style with crimson highlight) */
+.item-sharing {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--border-subtle);
+}
+.btn-pill {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.28rem 0.65rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.btn-pill:hover {
+  color: #fff;
+  border-color: var(--border-hover);
+}
+.btn-pill.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.btn-pill.pill-all {
+  border-style: dashed;
+}
+.btn-pill.pill-all.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-style: solid;
+  border-color: var(--accent);
+}
+
+.btn-add-item {
+  width: 100%;
+  margin-top: 0.9rem;
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 0.75rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: all 0.2s;
+}
+.btn-add-item:hover {
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── Step 3: VAT & SD ── */
+.taxes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.tax-item {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.95rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.tax-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tax-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.btn-toggle-group {
+  display: inline-flex;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.btn-toggle {
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.22rem 0.55rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-toggle.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.tax-preview {
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  display: flex;
+  justify-content: space-between;
+}
+.tax-preview strong {
+  color: var(--text);
+}
+
+/* ── Step 4: Summary ── */
+.summary-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+.summary-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.summary-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: #ffffff;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.summary-title::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.view-tabs {
+  display: flex;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+}
+.view-tab {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.view-tab.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Overview Bar */
+.totals-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.35rem;
+}
+.tot-box {
+  display: flex;
+  flex-direction: column;
+}
+.tot-label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tot-val {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+.tot-val.accent-val {
+  color: var(--accent);
+}
+
+/* Unified Font Cards View */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.85rem;
+}
+.res-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: border-color 0.2s;
+}
+.res-card:hover {
+  border-color: var(--accent-border);
+}
+.res-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.res-card-name {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+.res-card-total {
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.res-card-breakdown {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Table View */
+.table-wrap {
+  overflow-x: auto;
+}
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.summary-table th {
+  text-align: left;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+.summary-table td {
+  padding: 0.8rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+.summary-table tr:last-child td {
+  border-bottom: none;
+}
+.summary-table td.name-col {
+  font-weight: 600;
+  color: #ffffff;
+}
+.summary-table td.total-col {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+/* Footer */
+.site-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+@media (max-width: 600px) {
+  body { padding: 1.5rem 0.85rem 4rem; }
+  .totals-bar { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+  .item-inputs { grid-template-columns: 1fr 105px 36px; }
+  .taxes-grid { grid-template-columns: 1fr; }
+  .cards-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- Header -->
+  <header class="app-header">
+    <h1 class="brand-title">Project Bill Split</h1>
+  </header>
+
+  <!-- Section 1: People -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">People</h2>
+    </div>
+    <div class="people-list" id="people-container">
+      <!-- Injected by JS -->
+    </div>
+  </section>
+
+  <!-- Section 2: Items -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">Items</h2>
+    </div>
+    
+    <div class="items-table" id="items-container">
+      <!-- Injected by JS -->
+    </div>
+
+    <button class="btn-add-item" id="add-item-btn">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg>
+      Add Item
+    </button>
+  </section>
+
+  <!-- Section 3: Taxes -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">VAT &amp; SD</h2>
+    </div>
+    
+    <div class="taxes-grid">
+      <!-- VAT -->
+      <div class="tax-item">
+        <div class="tax-item-header">
+          <span class="tax-name">VAT</span>
+          <div class="btn-toggle-group">
+            <button class="btn-toggle active" id="vat-mode-flat" onclick="setTaxMode('vat', 'flat')">৳ Flat</button>
+            <button class="btn-toggle" id="vat-mode-pct" onclick="setTaxMode('vat', 'pct')">%</button>
+          </div>
+        </div>
+        <div class="price-box">
+          <span class="currency-symbol" id="vat-currency-symbol">৳</span>
+          <input type="number" step="any" min="0" class="input-field" id="vat-input" placeholder="0" value="0">
+        </div>
+        <div class="tax-preview">
+          <span>Total:</span>
+          <strong id="vat-computed-text">৳ 0.00</strong>
+        </div>
+      </div>
+
+      <!-- Supplementary Duty (SD) -->
+      <div class="tax-item">
+        <div class="tax-item-header">
+          <span class="tax-name">SD</span>
+          <div class="btn-toggle-group">
+            <button class="btn-toggle active" id="sd-mode-flat" onclick="setTaxMode('sd', 'flat')">৳ Flat</button>
+            <button class="btn-toggle" id="sd-mode-pct" onclick="setTaxMode('sd', 'pct')">%</button>
+          </div>
+        </div>
+        <div class="price-box">
+          <span class="currency-symbol" id="sd-currency-symbol">৳</span>
+          <input type="number" step="any" min="0" class="input-field" id="sd-input" placeholder="0" value="0">
+        </div>
+        <div class="tax-preview">
+          <span>Total:</span>
+          <strong id="sd-computed-text">৳ 0.00</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Summary -->
+  <section class="summary-section">
+    <div class="summary-top">
+      <h2 class="summary-title">Summary</h2>
+
+      <!-- View Switcher -->
+      <div class="view-tabs">
+        <button class="view-tab active" id="view-card-btn" onclick="setViewMode('card')">Cards</button>
+        <button class="view-tab" id="view-table-btn" onclick="setViewMode('table')">Table</button>
+      </div>
+    </div>
+
+    <!-- Totals Bar -->
+    <div class="totals-bar">
+      <div class="tot-box">
+        <span class="tot-label">Food Subtotal</span>
+        <span class="tot-val" id="sum-subtotal">৳ 0.00</span>
+      </div>
+      <div class="tot-box">
+        <span class="tot-label">VAT</span>
+        <span class="tot-val" id="sum-vat">৳ 0.00</span>
+      </div>
+      <div class="tot-box">
+        <span class="tot-label">SD</span>
+        <span class="tot-val" id="sum-sd">৳ 0.00</span>
+      </div>
+      <div class="tot-box">
+        <span class="tot-label">Total</span>
+        <span class="tot-val accent-val" id="sum-grand">৳ 0.00</span>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div id="results-display"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div>Project Bill Split</div>
+    <div>&copy; <script>document.write(new Date().getFullYear())</script> Ahnaf Tahmid Patwary</div>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  var state = {
+    people: [
+      { id: 'p1', name: 'Person 1' },
+      { id: 'p2', name: 'Person 2' },
+      { id: 'p3', name: 'Person 3' }
+    ],
+    items: [
+      { id: 'it1', name: 'Dumpling', price: 320, splitWith: ['p1', 'p2', 'p3'] },
+      { id: 'it2', name: 'Fried Rice', price: 450, splitWith: ['p1', 'p2', 'p3'] }
+    ],
+    tax: {
+      vat: { mode: 'flat', val: 0 },
+      sd:  { mode: 'flat', val: 0 }
+    },
+    viewMode: 'card'
+  };
+
+  var nextPersonIndex = 4;
+
+  function uid() {
+    return 'id_' + Math.random().toString(36).substring(2, 9);
+  }
+
+  function fmt(num) {
+    if (isNaN(num) || num === null || num === undefined) return '0.00';
+    return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  /* ── PEOPLE ── */
+  function renderPeople() {
+    var container = document.getElementById('people-container');
+    container.innerHTML = '';
+
+    state.people.forEach(function(person, idx) {
+      var tag = document.createElement('div');
+      tag.className = 'person-tag';
+
+      var input = document.createElement('input');
+      input.className = 'person-name-input';
+      input.type = 'text';
+      input.value = person.name;
+      input.placeholder = 'Name';
+      input.addEventListener('input', function() {
+        person.name = this.value || ('Person ' + (idx + 1));
+        renderItems();
+        recalculate();
+      });
+
+      var del = document.createElement('button');
+      del.className = 'btn-del-person';
+      del.title = 'Remove person';
+      del.disabled = state.people.length <= 2;
+      del.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>';
+      del.addEventListener('click', function() {
+        if (state.people.length <= 2) return;
+        removePerson(person.id);
+      });
+
+      tag.appendChild(input);
+      tag.appendChild(del);
+      container.appendChild(tag);
+    });
+
+    var addBtn = document.createElement('button');
+    addBtn.className = 'btn-add-person';
+    addBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="1" x2="7" y2="13"/><line x1="1" y1="7" x2="13" y2="7"/></svg> Add Person';
+    addBtn.addEventListener('click', addPerson);
+    container.appendChild(addBtn);
+  }
+
+  function addPerson() {
+    var newId = uid();
+    var defaultName = 'Person ' + (nextPersonIndex++);
+    state.people.push({ id: newId, name: defaultName });
+    renderPeople();
+    renderItems();
+    recalculate();
+  }
+
+  function removePerson(personId) {
+    if (state.people.length <= 2) return;
+    state.people = state.people.filter(function(p) { return p.id !== personId; });
+    state.items.forEach(function(item) {
+      item.splitWith = item.splitWith.filter(function(pid) { return pid !== personId; });
+    });
+    renderPeople();
+    renderItems();
+    recalculate();
+  }
+
+  /* ── ITEMS ── */
+  function renderItems() {
+    var container = document.getElementById('items-container');
+    container.innerHTML = '';
+
+    state.items.forEach(function(item, itemIdx) {
+      var row = document.createElement('div');
+      row.className = 'item-row';
+
+      var inputs = document.createElement('div');
+      inputs.className = 'item-inputs';
+
+      var nameInput = document.createElement('input');
+      nameInput.className = 'input-field';
+      nameInput.type = 'text';
+      nameInput.placeholder = 'Item name';
+      nameInput.value = item.name;
+      nameInput.addEventListener('input', function() {
+        item.name = this.value;
+        recalculate();
+      });
+
+      var priceBox = document.createElement('div');
+      priceBox.className = 'price-box';
+      var sym = document.createElement('span');
+      sym.className = 'currency-symbol';
+      sym.textContent = '৳';
+      var priceInput = document.createElement('input');
+      priceInput.className = 'input-field';
+      priceInput.type = 'number';
+      priceInput.step = 'any';
+      priceInput.min = '0';
+      priceInput.placeholder = '0';
+      priceInput.value = item.price || '';
+      priceInput.addEventListener('input', function() {
+        item.price = parseFloat(this.value) || 0;
+        recalculate();
+      });
+      priceBox.appendChild(sym);
+      priceBox.appendChild(priceInput);
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'btn-del-item';
+      delBtn.title = 'Remove item';
+      delBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="1.5" y1="1.5" x2="13.5" y2="13.5"/><line x1="13.5" y1="1.5" x2="1.5" y2="13.5"/></svg>';
+      delBtn.addEventListener('click', function() {
+        state.items.splice(itemIdx, 1);
+        renderItems();
+        recalculate();
+      });
+
+      inputs.appendChild(nameInput);
+      inputs.appendChild(priceBox);
+      inputs.appendChild(delBtn);
+
+      var sharing = document.createElement('div');
+      sharing.className = 'item-sharing';
+
+      var isAllSelected = (item.splitWith.length === state.people.length && state.people.length > 0);
+      var allPill = document.createElement('button');
+      allPill.className = 'btn-pill pill-all' + (isAllSelected ? ' active' : '');
+      allPill.textContent = 'All';
+      allPill.addEventListener('click', function() {
+        if (item.splitWith.length === state.people.length) {
+          item.splitWith = [];
+        } else {
+          item.splitWith = state.people.map(function(p) { return p.id; });
+        }
+        renderItems();
+        recalculate();
+      });
+      sharing.appendChild(allPill);
+
+      state.people.forEach(function(person) {
+        var isSelected = item.splitWith.indexOf(person.id) !== -1;
+        var pBtn = document.createElement('button');
+        pBtn.className = 'btn-pill' + (isSelected ? ' active' : '');
+        pBtn.textContent = person.name;
+        pBtn.addEventListener('click', function() {
+          var idx = item.splitWith.indexOf(person.id);
+          if (idx === -1) {
+            item.splitWith.push(person.id);
+          } else {
+            item.splitWith.splice(idx, 1);
+          }
+          renderItems();
+          recalculate();
+        });
+        sharing.appendChild(pBtn);
+      });
+
+      row.appendChild(inputs);
+      row.appendChild(sharing);
+      container.appendChild(row);
+    });
+  }
+
+  function addItem() {
+    state.items.push({
+      id: uid(),
+      name: '',
+      price: 0,
+      splitWith: []
+    });
+    renderItems();
+    recalculate();
+  }
+
+  /* ── TAXES ── */
+  window.setTaxMode = function(type, mode) {
+    state.tax[type].mode = mode;
+    var flatBtn = document.getElementById(type + '-mode-flat');
+    var pctBtn = document.getElementById(type + '-mode-pct');
+    var sym = document.getElementById(type + '-currency-symbol');
+
+    if (mode === 'flat') {
+      flatBtn.classList.add('active');
+      pctBtn.classList.remove('active');
+      sym.textContent = '৳';
+    } else {
+      pctBtn.classList.add('active');
+      flatBtn.classList.remove('active');
+      sym.textContent = '%';
+    }
+    recalculate();
+  };
+
+  document.getElementById('vat-input').addEventListener('input', function() {
+    state.tax.vat.val = parseFloat(this.value) || 0;
+    recalculate();
+  });
+
+  document.getElementById('sd-input').addEventListener('input', function() {
+    state.tax.sd.val = parseFloat(this.value) || 0;
+    recalculate();
+  });
+
+  /* ── VIEW SWITCH ── */
+  window.setViewMode = function(mode) {
+    state.viewMode = mode;
+    document.getElementById('view-card-btn').classList.toggle('active', mode === 'card');
+    document.getElementById('view-table-btn').classList.toggle('active', mode === 'table');
+    recalculate();
+  };
+
+  /* ── ARITHMETIC ── */
+  function recalculate() {
+    var foodSubtotal = 0;
+    var personBreakdown = {};
+
+    state.people.forEach(function(p) {
+      personBreakdown[p.id] = {
+        name: p.name,
+        foodShare: 0,
+        vatShare: 0,
+        sdShare: 0,
+        total: 0
+      };
+    });
+
+    state.items.forEach(function(item) {
+      var itemPrice = parseFloat(item.price) || 0;
+      foodSubtotal += itemPrice;
+
+      if (item.splitWith.length > 0 && itemPrice > 0) {
+        var perPerson = itemPrice / item.splitWith.length;
+        item.splitWith.forEach(function(pid) {
+          if (personBreakdown[pid]) {
+            personBreakdown[pid].foodShare += perPerson;
+          }
+        });
+      }
+    });
+
+    var totalVat = 0;
+    if (state.tax.vat.mode === 'flat') {
+      totalVat = state.tax.vat.val;
+    } else {
+      totalVat = (foodSubtotal * state.tax.vat.val) / 100;
+    }
+
+    var totalSd = 0;
+    if (state.tax.sd.mode === 'flat') {
+      totalSd = state.tax.sd.val;
+    } else {
+      totalSd = (foodSubtotal * state.tax.sd.val) / 100;
+    }
+
+    var grandTotal = foodSubtotal + totalVat + totalSd;
+
+    state.people.forEach(function(p) {
+      var pb = personBreakdown[p.id];
+      var ratio = foodSubtotal > 0 ? (pb.foodShare / foodSubtotal) : (1 / state.people.length);
+      pb.vatShare = totalVat * ratio;
+      pb.sdShare = totalSd * ratio;
+      pb.total = pb.foodShare + pb.vatShare + pb.sdShare;
+    });
+
+    document.getElementById('sum-subtotal').textContent = '৳ ' + fmt(foodSubtotal);
+    document.getElementById('sum-vat').textContent = '৳ ' + fmt(totalVat);
+    document.getElementById('sum-sd').textContent = '৳ ' + fmt(totalSd);
+    document.getElementById('sum-grand').textContent = '৳ ' + fmt(grandTotal);
+
+    document.getElementById('vat-computed-text').textContent = '৳ ' + fmt(totalVat);
+    document.getElementById('sd-computed-text').textContent = '৳ ' + fmt(totalSd);
+
+    renderResults(personBreakdown);
+  }
+
+  function renderResults(breakdown) {
+    var display = document.getElementById('results-display');
+    display.innerHTML = '';
+
+    if (state.viewMode === 'card') {
+      var grid = document.createElement('div');
+      grid.className = 'cards-grid';
+
+      state.people.forEach(function(p) {
+        var pb = breakdown[p.id];
+        var card = document.createElement('div');
+        card.className = 'res-card';
+
+        var top = document.createElement('div');
+        top.className = 'res-card-top';
+        top.innerHTML = '<span class="res-card-name" title="' + pb.name + '">' + pb.name + '</span><span class="res-card-total">৳ ' + fmt(pb.total) + '</span>';
+
+        var details = document.createElement('div');
+        details.className = 'res-card-breakdown';
+        details.innerHTML = 
+          '<div class="breakdown-row"><span>Food Share:</span><span>৳ ' + fmt(pb.foodShare) + '</span></div>' +
+          '<div class="breakdown-row"><span>VAT:</span><span>৳ ' + fmt(pb.vatShare) + '</span></div>' +
+          '<div class="breakdown-row"><span>SD:</span><span>৳ ' + fmt(pb.sdShare) + '</span></div>';
+
+        card.appendChild(top);
+        card.appendChild(details);
+        grid.appendChild(card);
+      });
+
+      display.appendChild(grid);
+
+    } else {
+      var wrap = document.createElement('div');
+      wrap.className = 'table-wrap';
+
+      var table = document.createElement('table');
+      table.className = 'summary-table';
+      table.innerHTML = 
+        '<thead>' +
+          '<tr>' +
+            '<th>Person</th>' +
+            '<th>Food Share</th>' +
+            '<th>VAT</th>' +
+            '<th>SD</th>' +
+            '<th style="text-align:right;">Total</th>' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody></tbody>';
+
+      var tbody = table.querySelector('tbody');
+      state.people.forEach(function(p) {
+        var pb = breakdown[p.id];
+        var tr = document.createElement('tr');
+        tr.innerHTML = 
+          '<td class="name-col">' + pb.name + '</td>' +
+          '<td>৳ ' + fmt(pb.foodShare) + '</td>' +
+          '<td>৳ ' + fmt(pb.vatShare) + '</td>' +
+          '<td>৳ ' + fmt(pb.sdShare) + '</td>' +
+          '<td class="total-col" style="text-align:right;">৳ ' + fmt(pb.total) + '</td>';
+        tbody.appendChild(tr);
+      });
+
+      wrap.appendChild(table);
+      display.appendChild(wrap);
+    }
+  }
+
+  // Listeners
+  document.getElementById('add-item-btn').addEventListener('click', addItem);
+
+  // Run
+  renderPeople();
+  renderItems();
+  recalculate();
+
+})();
+</script>
+</body>
+</html>
