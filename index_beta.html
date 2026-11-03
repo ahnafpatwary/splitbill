@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Project Bill Split</title>
+<title>SplitBill</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -23,10 +23,16 @@
   --text-muted: #a1a1aa;
   --text-dim: #71717a;
 
-  /* Accent: Refined Crimson */
+  /* Accent: Refined Crimson — reserved for titles dot, grand total, delete hovers */
   --accent: #e11d48;
   --accent-soft: rgba(225, 29, 72, 0.08);
   --accent-border: rgba(225, 29, 72, 0.5);
+
+  /* Secondary Accent: Slate Periwinkle */
+  --accent2: #a5b4fc;
+  --accent2-border: rgba(165, 180, 252, 0.45);
+  --accent2-border-bright: #a5b4fc;
+  --accent2-soft: rgba(165, 180, 252, 0.12);
 
   --font-serif: 'Instrument Serif', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -85,6 +91,7 @@ body {
   align-items: center;
   gap: 0.5rem;
 }
+/* Crimson dot — user explicitly likes this, keep it */
 .section-title::before {
   content: '';
   display: inline-block;
@@ -111,8 +118,9 @@ body {
   gap: 0.45rem;
   transition: border-color 0.2s;
 }
+/* Accent 2 focus */
 .person-tag:focus-within {
-  border-color: var(--accent);
+  border-color: var(--accent2-border-bright);
 }
 .person-name-input {
   background: transparent;
@@ -134,6 +142,7 @@ body {
   padding: 2px;
   transition: color 0.15s;
 }
+/* Delete stays crimson — destructive action */
 .btn-del-person:hover:not(:disabled) {
   color: var(--accent);
 }
@@ -156,9 +165,10 @@ body {
   gap: 0.35rem;
   transition: all 0.2s;
 }
+/* Accent 2 hover */
 .btn-add-person:hover {
-  color: #fff;
-  border-color: var(--accent);
+  color: var(--accent2);
+  border-color: var(--accent2-border-bright);
 }
 
 /* ── Step 2: Items ── */
@@ -198,8 +208,9 @@ body {
   width: 100%;
   transition: border-color 0.2s;
 }
+/* Accent 2 focus */
 .input-field:focus {
-  border-color: var(--accent);
+  border-color: var(--accent2-border-bright);
 }
 .price-box {
   position: relative;
@@ -229,13 +240,14 @@ body {
   justify-content: center;
   transition: all 0.15s;
 }
+/* Delete stays crimson — destructive action */
 .btn-del-item:hover {
   color: var(--accent);
   border-color: var(--accent-border);
   background: var(--accent-soft);
 }
 
-/* Split Pills (Clean outline style with crimson highlight) */
+/* Split Pills — switchable secondary accent active states */
 .item-sharing {
   display: flex;
   align-items: center;
@@ -261,20 +273,22 @@ body {
   color: #fff;
   border-color: var(--border-hover);
 }
+/* Clean outline style: transparent background, only border & text highlight */
 .btn-pill.active {
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-color: var(--accent);
+  background: transparent;
+  color: var(--accent2);
+  border-color: var(--accent2-border-bright);
   font-weight: 600;
 }
 .btn-pill.pill-all {
   border-style: dashed;
 }
+/* Clean outline style for "All" pill */
 .btn-pill.pill-all.active {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: transparent;
+  color: var(--accent2);
   border-style: solid;
-  border-color: var(--accent);
+  border-color: var(--accent2-border-bright);
 }
 
 .btn-add-item {
@@ -295,9 +309,10 @@ body {
   gap: 0.45rem;
   transition: all 0.2s;
 }
+/* Accent 2 hover */
 .btn-add-item:hover {
-  color: #fff;
-  border-color: var(--accent);
+  color: var(--accent2);
+  border-color: var(--accent2-border-bright);
 }
 
 /* ── Step 3: VAT & SD ── */
@@ -345,9 +360,10 @@ body {
   cursor: pointer;
   transition: all 0.15s;
 }
+/* Secondary Accent active toggle */
 .btn-toggle.active {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--accent2-soft);
+  color: var(--accent2);
   font-weight: 600;
 }
 .tax-preview {
@@ -384,6 +400,7 @@ body {
   align-items: center;
   gap: 0.5rem;
 }
+/* Crimson dot — keep it */
 .summary-title::before {
   content: '';
   display: inline-block;
@@ -391,30 +408,6 @@ body {
   height: 5px;
   border-radius: 50%;
   background: var(--accent);
-}
-.view-tabs {
-  display: flex;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px;
-}
-.view-tab {
-  background: transparent;
-  border: none;
-  border-radius: 4px;
-  padding: 0.3rem 0.75rem;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.view-tab.active {
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-weight: 600;
 }
 
 /* Overview Bar */
@@ -445,11 +438,12 @@ body {
   font-weight: 700;
   color: #ffffff;
 }
+/* Crimson for grand total — intentional, keep it */
 .tot-val.accent-val {
   color: var(--accent);
 }
 
-/* Unified Font Cards View */
+/* Cards View */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -465,8 +459,9 @@ body {
   gap: 0.65rem;
   transition: border-color 0.2s;
 }
+/* Card hover */
 .res-card:hover {
-  border-color: var(--accent-border);
+  border-color: var(--accent2-border);
 }
 .res-card-top {
   display: flex;
@@ -483,11 +478,12 @@ body {
   text-overflow: ellipsis;
   max-width: 120px;
 }
+/* Individual share in secondary accent — grand total stays crimson */
 .res-card-total {
   font-family: var(--font-sans);
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent2);
 }
 .res-card-breakdown {
   border-top: 1px solid var(--border-subtle);
@@ -504,43 +500,6 @@ body {
   justify-content: space-between;
 }
 
-/* Table View */
-.table-wrap {
-  overflow-x: auto;
-}
-.summary-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.88rem;
-}
-.summary-table th {
-  text-align: left;
-  padding: 0.65rem 0.8rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  border-bottom: 1px solid var(--border);
-}
-.summary-table td {
-  padding: 0.8rem;
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-}
-.summary-table tr:last-child td {
-  border-bottom: none;
-}
-.summary-table td.name-col {
-  font-weight: 600;
-  color: #ffffff;
-}
-.summary-table td.total-col {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--accent);
-}
-
 /* Footer */
 .site-footer {
   margin-top: 3.5rem;
@@ -554,11 +513,42 @@ body {
 }
 
 @media (max-width: 600px) {
-  body { padding: 1.5rem 0.85rem 4rem; }
+  body { padding: 1.25rem 0.85rem 4rem; }
   .totals-bar { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
-  .item-inputs { grid-template-columns: 1fr 105px 36px; }
+  .item-inputs { grid-template-columns: 1fr 110px 40px; }
   .taxes-grid { grid-template-columns: 1fr; }
   .cards-grid { grid-template-columns: 1fr; }
+
+  /* 16px font prevents iOS Safari from auto-zooming into inputs */
+  .input-field, .person-name-input {
+    font-size: 16px !important;
+  }
+
+  /* Thumb-friendly mobile touch targets */
+  .btn-pill {
+    padding: 0.38rem 0.72rem;
+    font-size: 0.85rem;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-del-person {
+    padding: 6px;
+    min-width: 28px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-del-item {
+    height: 42px;
+    width: 40px;
+  }
+  .btn-add-item, .btn-add-person {
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 </style>
 </head>
@@ -568,7 +558,7 @@ body {
   
   <!-- Header -->
   <header class="app-header">
-    <h1 class="brand-title">Project Bill Split</h1>
+    <h1 class="brand-title">SplitBill</h1>
   </header>
 
   <!-- Section 1: People -->
@@ -609,16 +599,16 @@ body {
         <div class="tax-item-header">
           <span class="tax-name">VAT</span>
           <div class="btn-toggle-group">
-            <button class="btn-toggle active" id="vat-mode-flat" onclick="setTaxMode('vat', 'flat')">৳ Flat</button>
-            <button class="btn-toggle" id="vat-mode-pct" onclick="setTaxMode('vat', 'pct')">%</button>
+            <button class="btn-toggle active" id="vat-mode-flat" onclick="setTaxMode('vat', 'flat')">Amount</button>
+            <button class="btn-toggle" id="vat-mode-pct" onclick="setTaxMode('vat', 'pct')">Rate (%)</button>
           </div>
         </div>
         <div class="price-box">
           <span class="currency-symbol" id="vat-currency-symbol">৳</span>
-          <input type="number" step="any" min="0" class="input-field" id="vat-input" placeholder="0" value="0">
+          <input type="number" step="any" min="0" inputmode="decimal" class="input-field" id="vat-input" placeholder="0" value="0">
         </div>
-        <div class="tax-preview">
-          <span>Total:</span>
+        <div class="tax-preview" id="vat-preview" style="display:none;">
+          <span>Total VAT:</span>
           <strong id="vat-computed-text">৳ 0.00</strong>
         </div>
       </div>
@@ -628,38 +618,32 @@ body {
         <div class="tax-item-header">
           <span class="tax-name">SD</span>
           <div class="btn-toggle-group">
-            <button class="btn-toggle active" id="sd-mode-flat" onclick="setTaxMode('sd', 'flat')">৳ Flat</button>
-            <button class="btn-toggle" id="sd-mode-pct" onclick="setTaxMode('sd', 'pct')">%</button>
+            <button class="btn-toggle active" id="sd-mode-flat" onclick="setTaxMode('sd', 'flat')">Amount</button>
+            <button class="btn-toggle" id="sd-mode-pct" onclick="setTaxMode('sd', 'pct')">Rate (%)</button>
           </div>
         </div>
         <div class="price-box">
           <span class="currency-symbol" id="sd-currency-symbol">৳</span>
-          <input type="number" step="any" min="0" class="input-field" id="sd-input" placeholder="0" value="0">
+          <input type="number" step="any" min="0" inputmode="decimal" class="input-field" id="sd-input" placeholder="0" value="0">
         </div>
-        <div class="tax-preview">
-          <span>Total:</span>
+        <div class="tax-preview" id="sd-preview" style="display:none;">
+          <span>Total SD:</span>
           <strong id="sd-computed-text">৳ 0.00</strong>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Section 4: Summary -->
+  <!-- Section 4: Summary — cards only, no view switcher -->
   <section class="summary-section">
     <div class="summary-top">
       <h2 class="summary-title">Summary</h2>
-
-      <!-- View Switcher -->
-      <div class="view-tabs">
-        <button class="view-tab active" id="view-card-btn" onclick="setViewMode('card')">Cards</button>
-        <button class="view-tab" id="view-table-btn" onclick="setViewMode('table')">Table</button>
-      </div>
     </div>
 
     <!-- Totals Bar -->
     <div class="totals-bar">
       <div class="tot-box">
-        <span class="tot-label">Food Subtotal</span>
+        <span class="tot-label">Subtotal</span>
         <span class="tot-val" id="sum-subtotal">৳ 0.00</span>
       </div>
       <div class="tot-box">
@@ -676,13 +660,13 @@ body {
       </div>
     </div>
 
-    <!-- Output -->
+    <!-- Output: cards only -->
     <div id="results-display"></div>
   </section>
 
   <!-- Footer -->
   <footer class="site-footer">
-    <div>Project Bill Split</div>
+    <div>SplitBill</div>
     <div>&copy; <script>document.write(new Date().getFullYear())</script> Ahnaf Tahmid Patwary</div>
   </footer>
 
@@ -703,8 +687,7 @@ body {
     tax: {
       vat: { mode: 'flat', val: 0 },
       sd:  { mode: 'flat', val: 0 }
-    },
-    viewMode: 'card'
+    }
   };
 
   var nextPersonIndex = 4;
@@ -813,6 +796,7 @@ body {
       priceInput.step = 'any';
       priceInput.min = '0';
       priceInput.placeholder = '0';
+      priceInput.setAttribute('inputmode', 'decimal');
       priceInput.value = item.price || '';
       priceInput.addEventListener('input', function() {
         item.price = parseFloat(this.value) || 0;
@@ -892,17 +876,23 @@ body {
   window.setTaxMode = function(type, mode) {
     state.tax[type].mode = mode;
     var flatBtn = document.getElementById(type + '-mode-flat');
-    var pctBtn = document.getElementById(type + '-mode-pct');
-    var sym = document.getElementById(type + '-currency-symbol');
+    var pctBtn  = document.getElementById(type + '-mode-pct');
+    var sym     = document.getElementById(type + '-currency-symbol');
+    var input   = document.getElementById(type + '-input');
+    var preview = document.getElementById(type + '-preview');
 
     if (mode === 'flat') {
       flatBtn.classList.add('active');
       pctBtn.classList.remove('active');
-      sym.textContent = '৳';
+      sym.textContent     = '৳';
+      input.placeholder   = '0';
+      preview.style.display = 'none';
     } else {
       pctBtn.classList.add('active');
       flatBtn.classList.remove('active');
-      sym.textContent = '%';
+      sym.textContent     = '%';
+      input.placeholder   = 'e.g. 15';
+      preview.style.display = 'flex';
     }
     recalculate();
   };
@@ -916,14 +906,6 @@ body {
     state.tax.sd.val = parseFloat(this.value) || 0;
     recalculate();
   });
-
-  /* ── VIEW SWITCH ── */
-  window.setViewMode = function(mode) {
-    state.viewMode = mode;
-    document.getElementById('view-card-btn').classList.toggle('active', mode === 'card');
-    document.getElementById('view-table-btn').classList.toggle('active', mode === 'table');
-    recalculate();
-  };
 
   /* ── ARITHMETIC ── */
   function recalculate() {
@@ -974,86 +956,56 @@ body {
       var pb = personBreakdown[p.id];
       var ratio = foodSubtotal > 0 ? (pb.foodShare / foodSubtotal) : (1 / state.people.length);
       pb.vatShare = totalVat * ratio;
-      pb.sdShare = totalSd * ratio;
-      pb.total = pb.foodShare + pb.vatShare + pb.sdShare;
+      pb.sdShare  = totalSd * ratio;
+      pb.total    = pb.foodShare + pb.vatShare + pb.sdShare;
     });
 
     document.getElementById('sum-subtotal').textContent = '৳ ' + fmt(foodSubtotal);
-    document.getElementById('sum-vat').textContent = '৳ ' + fmt(totalVat);
-    document.getElementById('sum-sd').textContent = '৳ ' + fmt(totalSd);
-    document.getElementById('sum-grand').textContent = '৳ ' + fmt(grandTotal);
+    document.getElementById('sum-vat').textContent      = '৳ ' + fmt(totalVat);
+    document.getElementById('sum-sd').textContent       = '৳ ' + fmt(totalSd);
+    document.getElementById('sum-grand').textContent    = '৳ ' + fmt(grandTotal);
 
-    document.getElementById('vat-computed-text').textContent = '৳ ' + fmt(totalVat);
-    document.getElementById('sd-computed-text').textContent = '৳ ' + fmt(totalSd);
+    // Only update preview text when preview is visible (Rate % mode)
+    if (state.tax.vat.mode === 'pct') {
+      document.getElementById('vat-computed-text').textContent = '৳ ' + fmt(totalVat);
+    }
+    if (state.tax.sd.mode === 'pct') {
+      document.getElementById('sd-computed-text').textContent = '৳ ' + fmt(totalSd);
+    }
 
     renderResults(personBreakdown);
   }
 
+  /* ── RESULTS: Cards only ── */
   function renderResults(breakdown) {
     var display = document.getElementById('results-display');
     display.innerHTML = '';
 
-    if (state.viewMode === 'card') {
-      var grid = document.createElement('div');
-      grid.className = 'cards-grid';
+    var grid = document.createElement('div');
+    grid.className = 'cards-grid';
 
-      state.people.forEach(function(p) {
-        var pb = breakdown[p.id];
-        var card = document.createElement('div');
-        card.className = 'res-card';
+    state.people.forEach(function(p) {
+      var pb = breakdown[p.id];
+      var card = document.createElement('div');
+      card.className = 'res-card';
 
-        var top = document.createElement('div');
-        top.className = 'res-card-top';
-        top.innerHTML = '<span class="res-card-name" title="' + pb.name + '">' + pb.name + '</span><span class="res-card-total">৳ ' + fmt(pb.total) + '</span>';
+      var top = document.createElement('div');
+      top.className = 'res-card-top';
+      top.innerHTML = '<span class="res-card-name" title="' + pb.name + '">' + pb.name + '</span><span class="res-card-total">৳ ' + fmt(pb.total) + '</span>';
 
-        var details = document.createElement('div');
-        details.className = 'res-card-breakdown';
-        details.innerHTML = 
-          '<div class="breakdown-row"><span>Food Share:</span><span>৳ ' + fmt(pb.foodShare) + '</span></div>' +
-          '<div class="breakdown-row"><span>VAT:</span><span>৳ ' + fmt(pb.vatShare) + '</span></div>' +
-          '<div class="breakdown-row"><span>SD:</span><span>৳ ' + fmt(pb.sdShare) + '</span></div>';
+      var details = document.createElement('div');
+      details.className = 'res-card-breakdown';
+      details.innerHTML = 
+        '<div class="breakdown-row"><span>Food Share:</span><span>৳ ' + fmt(pb.foodShare) + '</span></div>' +
+        '<div class="breakdown-row"><span>VAT:</span><span>৳ ' + fmt(pb.vatShare) + '</span></div>' +
+        '<div class="breakdown-row"><span>SD:</span><span>৳ ' + fmt(pb.sdShare) + '</span></div>';
 
-        card.appendChild(top);
-        card.appendChild(details);
-        grid.appendChild(card);
-      });
+      card.appendChild(top);
+      card.appendChild(details);
+      grid.appendChild(card);
+    });
 
-      display.appendChild(grid);
-
-    } else {
-      var wrap = document.createElement('div');
-      wrap.className = 'table-wrap';
-
-      var table = document.createElement('table');
-      table.className = 'summary-table';
-      table.innerHTML = 
-        '<thead>' +
-          '<tr>' +
-            '<th>Person</th>' +
-            '<th>Food Share</th>' +
-            '<th>VAT</th>' +
-            '<th>SD</th>' +
-            '<th style="text-align:right;">Total</th>' +
-          '</tr>' +
-        '</thead>' +
-        '<tbody></tbody>';
-
-      var tbody = table.querySelector('tbody');
-      state.people.forEach(function(p) {
-        var pb = breakdown[p.id];
-        var tr = document.createElement('tr');
-        tr.innerHTML = 
-          '<td class="name-col">' + pb.name + '</td>' +
-          '<td>৳ ' + fmt(pb.foodShare) + '</td>' +
-          '<td>৳ ' + fmt(pb.vatShare) + '</td>' +
-          '<td>৳ ' + fmt(pb.sdShare) + '</td>' +
-          '<td class="total-col" style="text-align:right;">৳ ' + fmt(pb.total) + '</td>';
-        tbody.appendChild(tr);
-      });
-
-      wrap.appendChild(table);
-      display.appendChild(wrap);
-    }
+    display.appendChild(grid);
   }
 
   // Listeners
