@@ -4,7 +4,7 @@ All notable changes and milestones for the SplitBill web application are documen
 
 ---
 
-## [v1.1] - 2026-11-03
+## [v2] - 2026-11-03
 
 ### Added
 - **Mobile Keypad Optimization:** Added `inputmode="decimal"` on all item price, VAT, and SD inputs for instant calculator-style numeric pad on phones.
