@@ -516,9 +516,31 @@ body {
   body { padding: 1.25rem 0.85rem 4rem; }
   .section { padding: 1.15rem 0.95rem; }
   .totals-bar { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
-  .item-inputs { grid-template-columns: 1fr 110px 40px; }
   .taxes-grid { grid-template-columns: 1fr; }
   .cards-grid { grid-template-columns: 1fr; }
+
+  /* Option 1: 2-Row Item Layout on Mobile (Spacious Name on Row 1, Price on Row 2) */
+  .item-inputs {
+    display: grid;
+    grid-template-columns: 1fr 38px;
+    grid-template-areas:
+      "name del"
+      "price price";
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .item-name-input {
+    grid-area: name;
+  }
+  .btn-del-item {
+    grid-area: del;
+    height: 38px;
+    width: 38px;
+  }
+  .item-inputs .price-box {
+    grid-area: price;
+    width: 100%;
+  }
 
   /* 2-column people grid on mobile */
   .people-list {
@@ -717,8 +739,6 @@ body {
     }
   };
 
-  var nextPersonIndex = 4;
-
   function uid() {
     return 'id_' + Math.random().toString(36).substring(2, 9);
   }
@@ -772,7 +792,7 @@ body {
 
   function addPerson() {
     var newId = uid();
-    var defaultName = 'Person ' + (nextPersonIndex++);
+    var defaultName = 'Person ' + (state.people.length + 1);
     state.people.push({ id: newId, name: defaultName });
     renderPeople();
     renderItems();
@@ -803,7 +823,7 @@ body {
       inputs.className = 'item-inputs';
 
       var nameInput = document.createElement('input');
-      nameInput.className = 'input-field';
+      nameInput.className = 'input-field item-name-input';
       nameInput.type = 'text';
       nameInput.placeholder = 'Item name';
       nameInput.value = item.name;
