@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -47,7 +47,7 @@ body {
   margin: 0 auto;
 }
 
-/* ÔöÇÔöÇ App Header ÔöÇÔöÇ */
+/* ── App Header ── */
 .app-header {
   margin-bottom: 2.25rem;
   padding-bottom: 1.25rem;
@@ -61,7 +61,7 @@ body {
   color: #ffffff;
 }
 
-/* ÔöÇÔöÇ Sections ÔöÇÔöÇ */
+/* ── Sections ── */
 .section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -94,7 +94,7 @@ body {
   background: var(--accent);
 }
 
-/* ÔöÇÔöÇ Step 1: People ÔöÇÔöÇ */
+/* ── Step 1: People ── */
 .people-list {
   display: flex;
   flex-wrap: wrap;
@@ -161,7 +161,7 @@ body {
   border-color: var(--accent);
 }
 
-/* ÔöÇÔöÇ Step 2: Items ÔöÇÔöÇ */
+/* ── Step 2: Items ── */
 .items-table {
   display: flex;
   flex-direction: column;
@@ -300,7 +300,7 @@ body {
   border-color: var(--accent);
 }
 
-/* ÔöÇÔöÇ Step 3: VAT & SD ÔöÇÔöÇ */
+/* ── Step 3: VAT & SD ── */
 .taxes-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -360,7 +360,7 @@ body {
   color: var(--text);
 }
 
-/* ÔöÇÔöÇ Step 4: Summary ÔöÇÔöÇ */
+/* ── Step 4: Summary ── */
 .summary-section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -609,17 +609,17 @@ body {
         <div class="tax-item-header">
           <span class="tax-name">VAT</span>
           <div class="btn-toggle-group">
-            <button class="btn-toggle active" id="vat-mode-flat" onclick="setTaxMode('vat', 'flat')">Óº│ Flat</button>
+            <button class="btn-toggle active" id="vat-mode-flat" onclick="setTaxMode('vat', 'flat')">৳ Flat</button>
             <button class="btn-toggle" id="vat-mode-pct" onclick="setTaxMode('vat', 'pct')">%</button>
           </div>
         </div>
         <div class="price-box">
-          <span class="currency-symbol" id="vat-currency-symbol">Óº│</span>
+          <span class="currency-symbol" id="vat-currency-symbol">৳</span>
           <input type="number" step="any" min="0" class="input-field" id="vat-input" placeholder="0" value="0">
         </div>
         <div class="tax-preview">
           <span>Total:</span>
-          <strong id="vat-computed-text">Óº│ 0.00</strong>
+          <strong id="vat-computed-text">৳ 0.00</strong>
         </div>
       </div>
 
@@ -628,17 +628,17 @@ body {
         <div class="tax-item-header">
           <span class="tax-name">SD</span>
           <div class="btn-toggle-group">
-            <button class="btn-toggle active" id="sd-mode-flat" onclick="setTaxMode('sd', 'flat')">Óº│ Flat</button>
+            <button class="btn-toggle active" id="sd-mode-flat" onclick="setTaxMode('sd', 'flat')">৳ Flat</button>
             <button class="btn-toggle" id="sd-mode-pct" onclick="setTaxMode('sd', 'pct')">%</button>
           </div>
         </div>
         <div class="price-box">
-          <span class="currency-symbol" id="sd-currency-symbol">Óº│</span>
+          <span class="currency-symbol" id="sd-currency-symbol">৳</span>
           <input type="number" step="any" min="0" class="input-field" id="sd-input" placeholder="0" value="0">
         </div>
         <div class="tax-preview">
           <span>Total:</span>
-          <strong id="sd-computed-text">Óº│ 0.00</strong>
+          <strong id="sd-computed-text">৳ 0.00</strong>
         </div>
       </div>
     </div>
@@ -660,19 +660,19 @@ body {
     <div class="totals-bar">
       <div class="tot-box">
         <span class="tot-label">Food Subtotal</span>
-        <span class="tot-val" id="sum-subtotal">Óº│ 0.00</span>
+        <span class="tot-val" id="sum-subtotal">৳ 0.00</span>
       </div>
       <div class="tot-box">
         <span class="tot-label">VAT</span>
-        <span class="tot-val" id="sum-vat">Óº│ 0.00</span>
+        <span class="tot-val" id="sum-vat">৳ 0.00</span>
       </div>
       <div class="tot-box">
         <span class="tot-label">SD</span>
-        <span class="tot-val" id="sum-sd">Óº│ 0.00</span>
+        <span class="tot-val" id="sum-sd">৳ 0.00</span>
       </div>
       <div class="tot-box">
         <span class="tot-label">Total</span>
-        <span class="tot-val accent-val" id="sum-grand">Óº│ 0.00</span>
+        <span class="tot-val accent-val" id="sum-grand">৳ 0.00</span>
       </div>
     </div>
 
@@ -718,7 +718,7 @@ body {
     return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  /* ÔöÇÔöÇ PEOPLE ÔöÇÔöÇ */
+  /* ── PEOPLE ── */
   function renderPeople() {
     var container = document.getElementById('people-container');
     container.innerHTML = '';
@@ -780,7 +780,7 @@ body {
     recalculate();
   }
 
-  /* ÔöÇÔöÇ ITEMS ÔöÇÔöÇ */
+  /* ── ITEMS ── */
   function renderItems() {
     var container = document.getElementById('items-container');
     container.innerHTML = '';
@@ -806,7 +806,7 @@ body {
       priceBox.className = 'price-box';
       var sym = document.createElement('span');
       sym.className = 'currency-symbol';
-      sym.textContent = 'Óº│';
+      sym.textContent = '৳';
       var priceInput = document.createElement('input');
       priceInput.className = 'input-field';
       priceInput.type = 'number';
@@ -888,7 +888,7 @@ body {
     recalculate();
   }
 
-  /* ÔöÇÔöÇ TAXES ÔöÇÔöÇ */
+  /* ── TAXES ── */
   window.setTaxMode = function(type, mode) {
     state.tax[type].mode = mode;
     var flatBtn = document.getElementById(type + '-mode-flat');
@@ -898,7 +898,7 @@ body {
     if (mode === 'flat') {
       flatBtn.classList.add('active');
       pctBtn.classList.remove('active');
-      sym.textContent = 'Óº│';
+      sym.textContent = '৳';
     } else {
       pctBtn.classList.add('active');
       flatBtn.classList.remove('active');
@@ -917,7 +917,7 @@ body {
     recalculate();
   });
 
-  /* ÔöÇÔöÇ VIEW SWITCH ÔöÇÔöÇ */
+  /* ── VIEW SWITCH ── */
   window.setViewMode = function(mode) {
     state.viewMode = mode;
     document.getElementById('view-card-btn').classList.toggle('active', mode === 'card');
@@ -925,7 +925,7 @@ body {
     recalculate();
   };
 
-  /* ÔöÇÔöÇ ARITHMETIC ÔöÇÔöÇ */
+  /* ── ARITHMETIC ── */
   function recalculate() {
     var foodSubtotal = 0;
     var personBreakdown = {};
@@ -978,13 +978,13 @@ body {
       pb.total = pb.foodShare + pb.vatShare + pb.sdShare;
     });
 
-    document.getElementById('sum-subtotal').textContent = 'Óº│ ' + fmt(foodSubtotal);
-    document.getElementById('sum-vat').textContent = 'Óº│ ' + fmt(totalVat);
-    document.getElementById('sum-sd').textContent = 'Óº│ ' + fmt(totalSd);
-    document.getElementById('sum-grand').textContent = 'Óº│ ' + fmt(grandTotal);
+    document.getElementById('sum-subtotal').textContent = '৳ ' + fmt(foodSubtotal);
+    document.getElementById('sum-vat').textContent = '৳ ' + fmt(totalVat);
+    document.getElementById('sum-sd').textContent = '৳ ' + fmt(totalSd);
+    document.getElementById('sum-grand').textContent = '৳ ' + fmt(grandTotal);
 
-    document.getElementById('vat-computed-text').textContent = 'Óº│ ' + fmt(totalVat);
-    document.getElementById('sd-computed-text').textContent = 'Óº│ ' + fmt(totalSd);
+    document.getElementById('vat-computed-text').textContent = '৳ ' + fmt(totalVat);
+    document.getElementById('sd-computed-text').textContent = '৳ ' + fmt(totalSd);
 
     renderResults(personBreakdown);
   }
@@ -1004,14 +1004,14 @@ body {
 
         var top = document.createElement('div');
         top.className = 'res-card-top';
-        top.innerHTML = '<span class="res-card-name" title="' + pb.name + '">' + pb.name + '</span><span class="res-card-total">Óº│ ' + fmt(pb.total) + '</span>';
+        top.innerHTML = '<span class="res-card-name" title="' + pb.name + '">' + pb.name + '</span><span class="res-card-total">৳ ' + fmt(pb.total) + '</span>';
 
         var details = document.createElement('div');
         details.className = 'res-card-breakdown';
         details.innerHTML = 
-          '<div class="breakdown-row"><span>Food Share:</span><span>Óº│ ' + fmt(pb.foodShare) + '</span></div>' +
-          '<div class="breakdown-row"><span>VAT:</span><span>Óº│ ' + fmt(pb.vatShare) + '</span></div>' +
-          '<div class="breakdown-row"><span>SD:</span><span>Óº│ ' + fmt(pb.sdShare) + '</span></div>';
+          '<div class="breakdown-row"><span>Food Share:</span><span>৳ ' + fmt(pb.foodShare) + '</span></div>' +
+          '<div class="breakdown-row"><span>VAT:</span><span>৳ ' + fmt(pb.vatShare) + '</span></div>' +
+          '<div class="breakdown-row"><span>SD:</span><span>৳ ' + fmt(pb.sdShare) + '</span></div>';
 
         card.appendChild(top);
         card.appendChild(details);
@@ -1044,10 +1044,10 @@ body {
         var tr = document.createElement('tr');
         tr.innerHTML = 
           '<td class="name-col">' + pb.name + '</td>' +
-          '<td>Óº│ ' + fmt(pb.foodShare) + '</td>' +
-          '<td>Óº│ ' + fmt(pb.vatShare) + '</td>' +
-          '<td>Óº│ ' + fmt(pb.sdShare) + '</td>' +
-          '<td class="total-col" style="text-align:right;">Óº│ ' + fmt(pb.total) + '</td>';
+          '<td>৳ ' + fmt(pb.foodShare) + '</td>' +
+          '<td>৳ ' + fmt(pb.vatShare) + '</td>' +
+          '<td>৳ ' + fmt(pb.sdShare) + '</td>' +
+          '<td class="total-col" style="text-align:right;">৳ ' + fmt(pb.total) + '</td>';
         tbody.appendChild(tr);
       });
 
