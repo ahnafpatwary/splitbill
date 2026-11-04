@@ -58,6 +58,9 @@ body {
   margin-bottom: 2.25rem;
   padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .brand-title {
   font-family: var(--font-serif);
@@ -65,6 +68,52 @@ body {
   font-weight: 400;
   letter-spacing: -0.01em;
   color: #ffffff;
+}
+.btn-reset {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 0.38rem 0.75rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+.btn-reset:hover {
+  color: #ffffff;
+  border-color: var(--border-hover);
+  background: var(--surface-raised);
+}
+
+/* ── Unassigned Item Warnings ── */
+.item-row.unassigned {
+  border-color: rgba(245, 158, 11, 0.45);
+}
+.unassigned-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.74rem;
+  color: #fbbf24;
+  font-weight: 500;
+  margin-left: auto;
+}
+.summary-warning-bar {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 6px;
+  padding: 0.65rem 0.95rem;
+  margin-bottom: 1.15rem;
+  font-size: 0.82rem;
+  color: #fcd34d;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* ── Sections ── */
@@ -608,6 +657,10 @@ body {
   <!-- Header -->
   <header class="app-header">
     <h1 class="brand-title">SplitBill</h1>
+    <button class="btn-reset" id="btn-reset" title="Start a fresh bill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      New Bill
+    </button>
   </header>
 
   <!-- Section 1: People -->
@@ -689,6 +742,9 @@ body {
       <h2 class="summary-title">Summary</h2>
     </div>
 
+    <!-- Subtle Unassigned Warning in Summary -->
+    <div id="summary-warning-container"></div>
+
     <!-- Totals Bar -->
     <div class="totals-bar">
       <div class="tot-box">
@@ -723,21 +779,7 @@ body {
 
 <script>
 (function() {
-  var state = {
-    people: [
-      { id: 'p1', name: 'Person 1' },
-      { id: 'p2', name: 'Person 2' },
-      { id: 'p3', name: 'Person 3' }
-    ],
-    items: [
-      { id: 'it1', name: 'Dumpling', price: 320, splitWith: ['p1', 'p2', 'p3'] },
-      { id: 'it2', name: 'Fried Rice', price: 450, splitWith: ['p1', 'p2', 'p3'] }
-    ],
-    tax: {
-      vat: { mode: 'flat', val: 0 },
-      sd:  { mode: 'flat', val: 0 }
-    }
-  };
+  var STORAGE_KEY = 'splitbill_state_v2';
 
   function uid() {
     return 'id_' + Math.random().toString(36).substring(2, 9);
@@ -747,6 +789,49 @@ body {
     if (isNaN(num) || num === null || num === undefined) return '0.00';
     return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
+
+  function getDefaultState() {
+    return {
+      people: [
+        { id: 'p1', name: 'Person 1' },
+        { id: 'p2', name: 'Person 2' },
+        { id: 'p3', name: 'Person 3' }
+      ],
+      items: [
+        { id: 'it1', name: '', price: 0, splitWith: [] },
+        { id: 'it2', name: '', price: 0, splitWith: [] }
+      ],
+      tax: {
+        vat: { mode: 'flat', val: 0 },
+        sd:  { mode: 'flat', val: 0 }
+      }
+    };
+  }
+
+  function loadState() {
+    try {
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed.people) && parsed.people.length >= 2 && Array.isArray(parsed.items) && parsed.tax) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not load saved state:', e);
+    }
+    return getDefaultState();
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.warn('Could not save state:', e);
+    }
+  }
+
+  var state = loadState();
 
   /* ── PEOPLE ── */
   function renderPeople() {
@@ -766,6 +851,7 @@ body {
         person.name = this.value || ('Person ' + (idx + 1));
         renderItems();
         recalculate();
+        saveState();
       });
 
       var del = document.createElement('button');
@@ -797,6 +883,7 @@ body {
     renderPeople();
     renderItems();
     recalculate();
+    saveState();
   }
 
   function removePerson(personId) {
@@ -808,16 +895,34 @@ body {
     renderPeople();
     renderItems();
     recalculate();
+    saveState();
   }
 
   /* ── ITEMS ── */
+  function updateItemWarning(row, item) {
+    var isUnassigned = (parseFloat(item.price) || 0) > 0 && item.splitWith.length === 0;
+    row.classList.toggle('unassigned', isUnassigned);
+
+    var existingTag = row.querySelector('.unassigned-tag');
+    var sharing = row.querySelector('.item-sharing');
+    if (isUnassigned && !existingTag && sharing) {
+      var tag = document.createElement('span');
+      tag.className = 'unassigned-tag';
+      tag.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Unassigned';
+      sharing.appendChild(tag);
+    } else if (!isUnassigned && existingTag) {
+      existingTag.remove();
+    }
+  }
+
   function renderItems() {
     var container = document.getElementById('items-container');
     container.innerHTML = '';
 
     state.items.forEach(function(item, itemIdx) {
+      var isUnassigned = (parseFloat(item.price) || 0) > 0 && item.splitWith.length === 0;
       var row = document.createElement('div');
-      row.className = 'item-row';
+      row.className = 'item-row' + (isUnassigned ? ' unassigned' : '');
 
       var inputs = document.createElement('div');
       inputs.className = 'item-inputs';
@@ -826,10 +931,10 @@ body {
       nameInput.className = 'input-field item-name-input';
       nameInput.type = 'text';
       nameInput.placeholder = 'Item name';
-      nameInput.value = item.name;
+      nameInput.value = item.name || '';
       nameInput.addEventListener('input', function() {
         item.name = this.value;
-        recalculate();
+        saveState();
       });
 
       var priceBox = document.createElement('div');
@@ -844,10 +949,12 @@ body {
       priceInput.min = '0';
       priceInput.placeholder = '0';
       priceInput.setAttribute('inputmode', 'decimal');
-      priceInput.value = item.price || '';
+      priceInput.value = item.price > 0 ? item.price : '';
       priceInput.addEventListener('input', function() {
         item.price = parseFloat(this.value) || 0;
+        updateItemWarning(row, item);
         recalculate();
+        saveState();
       });
       priceBox.appendChild(sym);
       priceBox.appendChild(priceInput);
@@ -860,11 +967,12 @@ body {
         state.items.splice(itemIdx, 1);
         renderItems();
         recalculate();
+        saveState();
       });
 
       inputs.appendChild(nameInput);
-      inputs.appendChild(priceBox);
       inputs.appendChild(delBtn);
+      inputs.appendChild(priceBox);
 
       var sharing = document.createElement('div');
       sharing.className = 'item-sharing';
@@ -881,6 +989,7 @@ body {
         }
         renderItems();
         recalculate();
+        saveState();
       });
       sharing.appendChild(allPill);
 
@@ -898,9 +1007,17 @@ body {
           }
           renderItems();
           recalculate();
+          saveState();
         });
         sharing.appendChild(pBtn);
       });
+
+      if (isUnassigned) {
+        var tag = document.createElement('span');
+        tag.className = 'unassigned-tag';
+        tag.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Unassigned';
+        sharing.appendChild(tag);
+      }
 
       row.appendChild(inputs);
       row.appendChild(sharing);
@@ -917,6 +1034,7 @@ body {
     });
     renderItems();
     recalculate();
+    saveState();
   }
 
   /* ── TAXES ── */
@@ -942,22 +1060,69 @@ body {
       preview.style.display = 'flex';
     }
     recalculate();
+    saveState();
   };
 
   document.getElementById('vat-input').addEventListener('input', function() {
     state.tax.vat.val = parseFloat(this.value) || 0;
     recalculate();
+    saveState();
   });
 
   document.getElementById('sd-input').addEventListener('input', function() {
     state.tax.sd.val = parseFloat(this.value) || 0;
     recalculate();
+    saveState();
   });
+
+  function syncTaxInputs() {
+    var vatIn = document.getElementById('vat-input');
+    var sdIn  = document.getElementById('sd-input');
+    vatIn.value = state.tax.vat.val > 0 ? state.tax.vat.val : '';
+    sdIn.value  = state.tax.sd.val > 0 ? state.tax.sd.val : '';
+
+    var vatFlat = document.getElementById('vat-mode-flat');
+    var vatPct  = document.getElementById('vat-mode-pct');
+    var vatSym  = document.getElementById('vat-currency-symbol');
+    var vatPrev = document.getElementById('vat-preview');
+    if (state.tax.vat.mode === 'pct') {
+      vatPct.classList.add('active');
+      vatFlat.classList.remove('active');
+      vatSym.textContent = '%';
+      vatIn.placeholder = 'e.g. 15';
+      vatPrev.style.display = 'flex';
+    } else {
+      vatFlat.classList.add('active');
+      vatPct.classList.remove('active');
+      vatSym.textContent = '৳';
+      vatIn.placeholder = '0';
+      vatPrev.style.display = 'none';
+    }
+
+    var sdFlat = document.getElementById('sd-mode-flat');
+    var sdPct  = document.getElementById('sd-mode-pct');
+    var sdSym  = document.getElementById('sd-currency-symbol');
+    var sdPrev = document.getElementById('sd-preview');
+    if (state.tax.sd.mode === 'pct') {
+      sdPct.classList.add('active');
+      sdFlat.classList.remove('active');
+      sdSym.textContent = '%';
+      sdIn.placeholder = 'e.g. 15';
+      sdPrev.style.display = 'flex';
+    } else {
+      sdFlat.classList.add('active');
+      sdPct.classList.remove('active');
+      sdSym.textContent = '৳';
+      sdIn.placeholder = '0';
+      sdPrev.style.display = 'none';
+    }
+  }
 
   /* ── ARITHMETIC ── */
   function recalculate() {
     var foodSubtotal = 0;
     var personBreakdown = {};
+    var unassignedCount = 0;
 
     state.people.forEach(function(p) {
       personBreakdown[p.id] = {
@@ -972,6 +1137,10 @@ body {
     state.items.forEach(function(item) {
       var itemPrice = parseFloat(item.price) || 0;
       foodSubtotal += itemPrice;
+
+      if (itemPrice > 0 && item.splitWith.length === 0) {
+        unassignedCount++;
+      }
 
       if (item.splitWith.length > 0 && itemPrice > 0) {
         var perPerson = itemPrice / item.splitWith.length;
@@ -1012,12 +1181,22 @@ body {
     document.getElementById('sum-sd').textContent       = '৳ ' + fmt(totalSd);
     document.getElementById('sum-grand').textContent    = '৳ ' + fmt(grandTotal);
 
-    // Only update preview text when preview is visible (Rate % mode)
     if (state.tax.vat.mode === 'pct') {
       document.getElementById('vat-computed-text').textContent = '৳ ' + fmt(totalVat);
     }
     if (state.tax.sd.mode === 'pct') {
       document.getElementById('sd-computed-text').textContent = '৳ ' + fmt(totalSd);
+    }
+
+    // Subtle Warning in Summary
+    var warnContainer = document.getElementById('summary-warning-container');
+    if (warnContainer) {
+      if (unassignedCount > 0) {
+        var itemText = unassignedCount === 1 ? '1 item has' : (unassignedCount + ' items have');
+        warnContainer.innerHTML = '<div class="summary-warning-bar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span><strong>' + itemText + '</strong> a price but no one is assigned to share it.</span></div>';
+      } else {
+        warnContainer.innerHTML = '';
+      }
     }
 
     renderResults(personBreakdown);
@@ -1058,7 +1237,19 @@ body {
   // Listeners
   document.getElementById('add-item-btn').addEventListener('click', addItem);
 
-  // Run
+  document.getElementById('btn-reset').addEventListener('click', function() {
+    if (confirm('Start a new bill? This will clear all items and reset to 3 people.')) {
+      state = getDefaultState();
+      saveState();
+      syncTaxInputs();
+      renderPeople();
+      renderItems();
+      recalculate();
+    }
+  });
+
+  // Init
+  syncTaxInputs();
   renderPeople();
   renderItems();
   recalculate();
