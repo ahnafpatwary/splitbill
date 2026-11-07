@@ -908,7 +908,7 @@ body {
     if (isUnassigned && !existingTag && sharing) {
       var tag = document.createElement('span');
       tag.className = 'unassigned-tag';
-      tag.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Unassigned';
+      tag.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><line x1="8" y1="4.5" x2="8" y2="8.5"/><circle cx="8" cy="11.5" r="0.6" fill="currentColor"/></svg> Unassigned';
       sharing.appendChild(tag);
     } else if (!isUnassigned && existingTag) {
       existingTag.remove();
@@ -1015,7 +1015,7 @@ body {
       if (isUnassigned) {
         var tag = document.createElement('span');
         tag.className = 'unassigned-tag';
-        tag.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Unassigned';
+        tag.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><line x1="8" y1="4.5" x2="8" y2="8.5"/><circle cx="8" cy="11.5" r="0.6" fill="currentColor"/></svg> Unassigned';
         sharing.appendChild(tag);
       }
 
@@ -1192,8 +1192,11 @@ body {
     var warnContainer = document.getElementById('summary-warning-container');
     if (warnContainer) {
       if (unassignedCount > 0) {
-        var itemText = unassignedCount === 1 ? '1 item has' : (unassignedCount + ' items have');
-        warnContainer.innerHTML = '<div class="summary-warning-bar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span><strong>' + itemText + '</strong> a price but no one is assigned to share it.</span></div>';
+        var itemWord = unassignedCount === 1 ? '1 item is' : (unassignedCount + ' items are');
+        warnContainer.innerHTML = '<div class="summary-warning-bar">' +
+          '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><line x1="8" y1="4.5" x2="8" y2="8.5"/><circle cx="8" cy="11.5" r="0.6" fill="currentColor"/></svg>' +
+          '<span><strong>Notice</strong> &mdash; ' + itemWord + ' unassigned and not included in anyone\'s share.</span>' +
+        '</div>';
       } else {
         warnContainer.innerHTML = '';
       }
