@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>SplitBill</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -68,6 +69,22 @@ body {
   font-weight: 400;
   letter-spacing: -0.01em;
   color: #ffffff;
+  display: inline-flex;
+  align-items: baseline;
+}
+.brand-i {
+  position: relative;
+  display: inline-block;
+}
+.brand-dot {
+  position: absolute;
+  top: 0.22em;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.13em;
+  height: 0.13em;
+  background: var(--accent);
+  border-radius: 50%;
 }
 .btn-reset {
   background: transparent;
@@ -549,6 +566,216 @@ body {
   justify-content: space-between;
 }
 
+/* ── Card Paid & Net Balance ── */
+.res-card-paid-row {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.paid-label {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.price-box-sm {
+  width: 115px;
+}
+.price-box-sm .currency-symbol {
+  font-size: 0.82rem;
+  padding: 0 0.45rem;
+}
+.price-box-sm .input-field {
+  padding: 0.32rem 0.5rem;
+  font-size: 0.85rem;
+  height: 32px;
+}
+.res-card-net {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: right;
+  min-height: 1.1rem;
+}
+.net-status.get-back {
+  color: #34d399;
+}
+.net-status.owes {
+  color: #f87171;
+}
+.net-status.settled {
+  color: var(--text-dim);
+}
+
+/* ── Settlement Section ── */
+.settlement-card {
+  margin-top: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.15rem 1.25rem;
+}
+.settlement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+.settlement-title {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+.settlement-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.settlement-badge.paid-full {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(52, 211, 153, 0.08);
+}
+.settlement-badge.paid-partial {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.08);
+}
+.settlement-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+.settlement-meta-item {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.settlement-meta-item .lbl {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.settlement-meta-item .val {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+.settlement-meta-item .accent-green {
+  color: #34d399;
+}
+.settlement-meta-item .accent-warn {
+  color: #f87171;
+}
+.settlement-transfers-title {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  margin-bottom: 0.55rem;
+}
+.settlement-transfers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.settlement-transfer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.transfer-direction {
+  color: var(--text-muted);
+}
+.transfer-direction strong {
+  color: #ffffff;
+}
+.transfer-amount {
+  font-weight: 600;
+  color: var(--accent2);
+}
+.settlement-empty-tip {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+/* ── WhatsApp Copy Button ── */
+.btn-whatsapp {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.85rem 1.25rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: all 0.2s ease;
+}
+.btn-whatsapp:hover {
+  background: #1a1a1a;
+  border-color: var(--border-hover);
+  color: #ffffff;
+}
+.btn-whatsapp:active {
+  transform: scale(0.99);
+}
+
+/* ── Toast Notification ── */
+.copy-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #18181b;
+  color: #ffffff;
+  border: 1px solid #27272a;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  padding: 0.65rem 1.15rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
+}
+.copy-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
 /* Footer */
 .site-footer {
   margin-top: 3.5rem;
@@ -656,7 +883,7 @@ body {
   
   <!-- Header -->
   <header class="app-header">
-    <h1 class="brand-title">SplitBill</h1>
+    <h1 class="brand-title" aria-label="SplitBill">Spl<span class="brand-i" aria-hidden="true">ı<span class="brand-dot"></span></span>tBill</h1>
     <button class="btn-reset" id="btn-reset" title="Start a fresh bill">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       New Bill
@@ -767,6 +994,21 @@ body {
 
     <!-- Output: cards only -->
     <div id="results-display"></div>
+
+    <!-- Settlement Card -->
+    <div class="settlement-card" id="settlement-card">
+      <div class="settlement-header">
+        <h3 class="settlement-title">Settlement</h3>
+        <span class="settlement-badge" id="settlement-status-badge">Unpaid</span>
+      </div>
+      <div id="settlement-content"></div>
+    </div>
+
+    <!-- Copy Summary for WhatsApp -->
+    <button class="btn-whatsapp" id="btn-copy-summary">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy Summary for WhatsApp
+    </button>
   </section>
 
   <!-- Footer -->
@@ -793,9 +1035,9 @@ body {
   function getDefaultState() {
     return {
       people: [
-        { id: 'p1', name: 'Person 1' },
-        { id: 'p2', name: 'Person 2' },
-        { id: 'p3', name: 'Person 3' }
+        { id: 'p1', name: 'Person 1', paid: 0 },
+        { id: 'p2', name: 'Person 2', paid: 0 },
+        { id: 'p3', name: 'Person 3', paid: 0 }
       ],
       items: [
         { id: 'it1', name: '', price: 0, splitWith: [] },
@@ -814,6 +1056,9 @@ body {
       if (saved) {
         var parsed = JSON.parse(saved);
         if (parsed && Array.isArray(parsed.people) && parsed.people.length >= 2 && Array.isArray(parsed.items) && parsed.tax) {
+          parsed.people.forEach(function(p) {
+            p.paid = parseFloat(p.paid) || 0;
+          });
           return parsed;
         }
       }
@@ -879,7 +1124,7 @@ body {
   function addPerson() {
     var newId = uid();
     var defaultName = 'Person ' + (state.people.length + 1);
-    state.people.push({ id: newId, name: defaultName });
+    state.people.push({ id: newId, name: defaultName, paid: 0 });
     renderPeople();
     renderItems();
     recalculate();
@@ -1202,39 +1447,307 @@ body {
       }
     }
 
-    renderResults(personBreakdown);
+    renderResults(personBreakdown, grandTotal, foodSubtotal, totalVat, totalSd);
   }
 
-  /* ── RESULTS: Cards only ── */
-  function renderResults(breakdown) {
-    var display = document.getElementById('results-display');
-    display.innerHTML = '';
+  /* ── RESULTS & SETTLEMENT ── */
+  var toastTimeout = null;
 
-    var grid = document.createElement('div');
-    grid.className = 'cards-grid';
+  function showToast(msg) {
+    var toast = document.getElementById('copy-toast');
+    if (!toast) return;
+    toast.querySelector('.toast-text').textContent = msg || 'Copied to clipboard';
+    toast.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function() {
+      toast.classList.remove('show');
+    }, 2200);
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    } else {
+      var textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      return new Promise(function(resolve, reject) {
+        document.execCommand('copy') ? resolve() : reject(new Error('copy failed'));
+        textArea.remove();
+      });
+    }
+  }
+
+  function computeTransfers(debtors, creditors) {
+    var dList = debtors.map(function(d) { return { name: d.name, amount: d.amount }; });
+    var cList = creditors.map(function(c) { return { name: c.name, amount: c.amount }; });
+    var transfers = [];
+
+    var i = 0;
+    var j = 0;
+    while (i < dList.length && j < cList.length) {
+      var d = dList[i];
+      var c = cList[j];
+      if (d.amount < 0.01) { i++; continue; }
+      if (c.amount < 0.01) { j++; continue; }
+
+      var payment = Math.min(d.amount, c.amount);
+      transfers.push({
+        from: d.name,
+        to: c.name,
+        amount: payment
+      });
+
+      d.amount -= payment;
+      c.amount -= payment;
+
+      if (d.amount < 0.01) i++;
+      if (c.amount < 0.01) j++;
+    }
+    return transfers;
+  }
+
+  function generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill) {
+    var lines = [];
+    lines.push('🧾 SplitBill Summary');
+    
+    var meta = [];
+    if (foodSubtotal > 0 && (totalVat > 0 || totalSd > 0)) {
+      meta.push('Subtotal: ৳ ' + fmt(foodSubtotal));
+      if (totalVat > 0) meta.push('VAT: ৳ ' + fmt(totalVat));
+      if (totalSd > 0) meta.push('SD: ৳ ' + fmt(totalSd));
+    }
+    if (meta.length > 0) {
+      lines.push('Total: ৳ ' + fmt(grandTotal) + ' (' + meta.join(', ') + ')');
+    } else {
+      lines.push('Total: ৳ ' + fmt(grandTotal));
+    }
+    lines.push('');
 
     state.people.forEach(function(p) {
       var pb = breakdown[p.id];
-      var card = document.createElement('div');
-      card.className = 'res-card';
-
-      var top = document.createElement('div');
-      top.className = 'res-card-top';
-      top.innerHTML = '<span class="res-card-name" title="' + pb.name + '">' + pb.name + '</span><span class="res-card-total">৳ ' + fmt(pb.total) + '</span>';
-
-      var details = document.createElement('div');
-      details.className = 'res-card-breakdown';
-      details.innerHTML = 
-        '<div class="breakdown-row"><span>Food Share:</span><span>৳ ' + fmt(pb.foodShare) + '</span></div>' +
-        '<div class="breakdown-row"><span>VAT:</span><span>৳ ' + fmt(pb.vatShare) + '</span></div>' +
-        '<div class="breakdown-row"><span>SD:</span><span>৳ ' + fmt(pb.sdShare) + '</span></div>';
-
-      card.appendChild(top);
-      card.appendChild(details);
-      grid.appendChild(card);
+      lines.push('• ' + pb.name + ': ৳ ' + fmt(pb.total));
     });
 
-    display.appendChild(grid);
+    if (transfers && transfers.length > 0) {
+      lines.push('');
+      lines.push('Settlement:');
+      transfers.forEach(function(t) {
+        lines.push('• ' + t.from + ' pays ৳ ' + fmt(t.amount) + ' to ' + t.to);
+      });
+      if (restaurantChange > 0.01) {
+        lines.push('• Restaurant Change: ৳ ' + fmt(restaurantChange));
+      }
+    } else if (remainingBill > 0.01) {
+      lines.push('');
+      lines.push('Remaining to pay restaurant: ৳ ' + fmt(remainingBill));
+    }
+
+    lines.push('');
+    lines.push('Split via ahnafpatwary.github.io/splitbill');
+    return lines.join('\n');
+  }
+
+  function renderSettlement(breakdown, grandTotal, foodSubtotal, totalVat, totalSd) {
+    var badge = document.getElementById('settlement-status-badge');
+    var content = document.getElementById('settlement-content');
+    if (!content) return;
+
+    var totalPaid = 0;
+    state.people.forEach(function(p) {
+      totalPaid += (parseFloat(p.paid) || 0);
+    });
+
+    var diff = totalPaid - grandTotal;
+    var hasPayments = totalPaid > 0;
+
+    var debtors = [];
+    var creditors = [];
+
+    state.people.forEach(function(p) {
+      var pb = breakdown[p.id];
+      var paid = parseFloat(p.paid) || 0;
+      var net = paid - pb.total;
+      if (net < -0.01) {
+        debtors.push({ id: p.id, name: pb.name, amount: -net });
+      } else if (net > 0.01) {
+        creditors.push({ id: p.id, name: pb.name, amount: net });
+      }
+    });
+
+    var transfers = computeTransfers(debtors, creditors);
+    var restaurantChange = diff > 0.01 ? diff : 0;
+    var remainingBill = diff < -0.01 ? -diff : 0;
+
+    if (badge) {
+      if (!hasPayments) {
+        badge.className = 'settlement-badge';
+        badge.textContent = 'Unpaid';
+      } else if (Math.abs(diff) < 0.01) {
+        badge.className = 'settlement-badge paid-full';
+        badge.textContent = 'Exact Paid';
+      } else if (diff > 0.01) {
+        badge.className = 'settlement-badge paid-full';
+        badge.textContent = 'Overpaid';
+      } else {
+        badge.className = 'settlement-badge paid-partial';
+        badge.textContent = 'Short by ৳ ' + fmt(remainingBill);
+      }
+    }
+
+    var html = '';
+    if (hasPayments) {
+      html += '<div class="settlement-meta-grid">';
+      html +=   '<div class="settlement-meta-item"><span class="lbl">Total Paid</span><span class="val">৳ ' + fmt(totalPaid) + '</span></div>';
+      if (restaurantChange > 0.01) {
+        html += '<div class="settlement-meta-item"><span class="lbl">Restaurant Change</span><span class="val accent-green">৳ ' + fmt(restaurantChange) + '</span></div>';
+      } else if (remainingBill > 0.01) {
+        html += '<div class="settlement-meta-item"><span class="lbl">Remaining Bill</span><span class="val accent-warn">৳ ' + fmt(remainingBill) + '</span></div>';
+      }
+      html += '</div>';
+
+      if (transfers.length > 0) {
+        html += '<div class="settlement-transfers-title">Suggested Transfers</div>';
+        html += '<div class="settlement-transfers">';
+        transfers.forEach(function(t) {
+          html += '<div class="settlement-transfer-item">' +
+                    '<span class="transfer-direction"><strong>' + t.from + '</strong> pays <strong>' + t.to + '</strong></span>' +
+                    '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
+                  '</div>';
+        });
+        html += '</div>';
+      } else if (Math.abs(diff) < 0.01 && grandTotal > 0) {
+        html += '<div class="settlement-empty-tip">Everyone paid their exact share directly. No transfers needed!</div>';
+      }
+    } else {
+      html += '<div class="settlement-empty-tip">Enter who paid what above to calculate settlement transfers, or tap below to copy the bill breakdown.</div>';
+    }
+
+    content.innerHTML = html;
+
+    var copyBtn = document.getElementById('btn-copy-summary');
+    if (copyBtn) {
+      copyBtn.onclick = function() {
+        var summaryText = generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill);
+        copyToClipboard(summaryText).then(function() {
+          showToast('Summary copied to clipboard!');
+        }).catch(function() {
+          showToast('Summary copied to clipboard!');
+        });
+      };
+    }
+  }
+
+  function renderResults(breakdown, grandTotal, foodSubtotal, totalVat, totalSd) {
+    var display = document.getElementById('results-display');
+    var grid = display.querySelector('.cards-grid');
+    var existingCards = grid ? grid.querySelectorAll('.res-card') : [];
+    var needsRebuild = (!grid || existingCards.length !== state.people.length);
+
+    if (!needsRebuild) {
+      for (var i = 0; i < state.people.length; i++) {
+        if (existingCards[i].getAttribute('data-person-id') !== state.people[i].id) {
+          needsRebuild = true;
+          break;
+        }
+      }
+    }
+
+    if (needsRebuild) {
+      display.innerHTML = '';
+      grid = document.createElement('div');
+      grid.className = 'cards-grid';
+
+      state.people.forEach(function(p) {
+        var pb = breakdown[p.id];
+        var card = document.createElement('div');
+        card.className = 'res-card';
+        card.setAttribute('data-person-id', p.id);
+
+        var top = document.createElement('div');
+        top.className = 'res-card-top';
+        top.innerHTML = '<span class="res-card-name" title="' + pb.name + '">' + pb.name + '</span><span class="res-card-total">৳ ' + fmt(pb.total) + '</span>';
+
+        var details = document.createElement('div');
+        details.className = 'res-card-breakdown';
+        details.innerHTML = 
+          '<div class="breakdown-row"><span>Food Share:</span><span class="val-food">৳ ' + fmt(pb.foodShare) + '</span></div>' +
+          '<div class="breakdown-row"><span>VAT:</span><span class="val-vat">৳ ' + fmt(pb.vatShare) + '</span></div>' +
+          '<div class="breakdown-row"><span>SD:</span><span class="val-sd">৳ ' + fmt(pb.sdShare) + '</span></div>';
+
+        var paidRow = document.createElement('div');
+        paidRow.className = 'res-card-paid-row';
+        paidRow.innerHTML = 
+          '<label class="paid-label">Paid:</label>' +
+          '<div class="price-box price-box-sm">' +
+            '<span class="currency-symbol">৳</span>' +
+            '<input type="number" step="any" min="0" inputmode="decimal" class="input-field paid-input" placeholder="0" value="' + (p.paid > 0 ? p.paid : '') + '">' +
+          '</div>';
+
+        var netRow = document.createElement('div');
+        netRow.className = 'res-card-net';
+
+        var paidInput = paidRow.querySelector('.paid-input');
+        paidInput.addEventListener('input', function() {
+          p.paid = parseFloat(this.value) || 0;
+          recalculate();
+          saveState();
+        });
+
+        card.appendChild(top);
+        card.appendChild(details);
+        card.appendChild(paidRow);
+        card.appendChild(netRow);
+        grid.appendChild(card);
+      });
+
+      display.appendChild(grid);
+    } else {
+      state.people.forEach(function(p, idx) {
+        var pb = breakdown[p.id];
+        var card = existingCards[idx];
+
+        card.querySelector('.res-card-name').textContent = pb.name;
+        card.querySelector('.res-card-name').title = pb.name;
+        card.querySelector('.res-card-total').textContent = '৳ ' + fmt(pb.total);
+        card.querySelector('.val-food').textContent = '৳ ' + fmt(pb.foodShare);
+        card.querySelector('.val-vat').textContent = '৳ ' + fmt(pb.vatShare);
+        card.querySelector('.val-sd').textContent = '৳ ' + fmt(pb.sdShare);
+
+        var paidInput = card.querySelector('.paid-input');
+        if (document.activeElement !== paidInput) {
+          paidInput.value = p.paid > 0 ? p.paid : '';
+        }
+      });
+    }
+
+    state.people.forEach(function(p, idx) {
+      var pb = breakdown[p.id];
+      var card = grid.children[idx];
+      var netEl = card.querySelector('.res-card-net');
+      var net = (p.paid || 0) - pb.total;
+
+      if (!p.paid || p.paid === 0) {
+        if (pb.total > 0.005) {
+          netEl.innerHTML = '<span class="net-status owes">Owes ৳ ' + fmt(pb.total) + '</span>';
+        } else {
+          netEl.innerHTML = '';
+        }
+      } else if (Math.abs(net) < 0.01) {
+        netEl.innerHTML = '<span class="net-status settled">✓ Settled</span>';
+      } else if (net > 0) {
+        netEl.innerHTML = '<span class="net-status get-back">+৳ ' + fmt(net) + ' (Gets back)</span>';
+      } else {
+        netEl.innerHTML = '<span class="net-status owes">-৳ ' + fmt(Math.abs(net)) + ' (Owes)</span>';
+      }
+    });
+
+    renderSettlement(breakdown, grandTotal, foodSubtotal, totalVat, totalSd);
   }
 
   // Listeners
@@ -1257,7 +1770,22 @@ body {
   renderItems();
   recalculate();
 
+  // Register Service Worker for offline capability
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').catch(function(err) {
+        console.warn('SW registration failed:', err);
+      });
+    });
+  }
+
 })();
 </script>
+
+<div id="copy-toast" class="copy-toast">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <span class="toast-text">Copied to clipboard</span>
+</div>
+
 </body>
 </html>
