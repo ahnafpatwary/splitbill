@@ -69,22 +69,6 @@ body {
   font-weight: 400;
   letter-spacing: -0.01em;
   color: #ffffff;
-  display: inline-flex;
-  align-items: baseline;
-}
-.brand-i {
-  position: relative;
-  display: inline-block;
-}
-.brand-dot {
-  position: absolute;
-  bottom: 0.51em;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0.12em;
-  height: 0.12em;
-  background: var(--accent);
-  border-radius: 50%;
 }
 .btn-reset {
   background: transparent;
@@ -813,6 +797,107 @@ body {
   opacity: 1;
 }
 
+/* ── In-App Modal Dialog ── */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-dialog {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hover);
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+  padding: 1.4rem 1.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+  transform: scale(0.95);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-backdrop.open .modal-dialog {
+  transform: scale(1);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.modal-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-title {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+.modal-body {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.4rem;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+.btn-modal {
+  padding: 0.52rem 1rem;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-modal-cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.btn-modal-cancel:hover {
+  background: var(--surface-input);
+  color: #ffffff;
+  border-color: var(--border-hover);
+}
+.btn-modal-confirm {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+.btn-modal-confirm:hover {
+  background: #f43f5e;
+  border-color: #f43f5e;
+}
+
 /* Footer */
 .site-footer {
   margin-top: 3.5rem;
@@ -920,7 +1005,7 @@ body {
   
   <!-- Header -->
   <header class="app-header">
-    <h1 class="brand-title" aria-label="SplitBill">Spl<span class="brand-i" aria-hidden="true">ı<span class="brand-dot"></span></span>tBill</h1>
+    <h1 class="brand-title">SplitBill</h1>
     <button class="btn-reset" id="btn-reset" title="Start a fresh bill">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       New Bill
@@ -1041,10 +1126,10 @@ body {
       <div id="settlement-content"></div>
     </div>
 
-    <!-- Copy Summary for WhatsApp -->
+    <!-- Copy Summary -->
     <button class="btn-whatsapp" id="btn-copy-summary">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      Copy Summary for WhatsApp
+      Copy Summary
     </button>
   </section>
 
@@ -1844,15 +1929,38 @@ body {
   // Listeners
   document.getElementById('add-item-btn').addEventListener('click', addItem);
 
-  document.getElementById('btn-reset').addEventListener('click', function() {
-    if (confirm('Start a new bill? This will clear all items and reset to 3 people.')) {
-      state = getDefaultState();
-      saveState();
-      syncTaxInputs();
-      renderPeople();
-      renderItems();
-      recalculate();
-    }
+  function openResetModal() {
+    var modal = document.getElementById('reset-modal');
+    modal.style.display = 'flex';
+    setTimeout(function() { modal.classList.add('open'); }, 10);
+  }
+
+  function closeResetModal() {
+    var modal = document.getElementById('reset-modal');
+    modal.classList.remove('open');
+    setTimeout(function() { modal.style.display = 'none'; }, 200);
+  }
+
+  document.getElementById('btn-reset').addEventListener('click', openResetModal);
+  document.getElementById('btn-modal-cancel').addEventListener('click', closeResetModal);
+
+  document.getElementById('reset-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeResetModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeResetModal();
+  });
+
+  document.getElementById('btn-modal-confirm').addEventListener('click', function() {
+    closeResetModal();
+    state = getDefaultState();
+    saveState();
+    syncTaxInputs();
+    renderPeople();
+    renderItems();
+    recalculate();
+    showToast('New bill started');
   });
 
   // Init
@@ -1872,6 +1980,23 @@ body {
 
 })();
 </script>
+
+<!-- In-App Reset Confirmation Modal -->
+<div class="modal-backdrop" id="reset-modal" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      </div>
+      <h3 class="modal-title">Start a New Bill?</h3>
+    </div>
+    <p class="modal-body">This will clear all items, payment entries, and reset to 3 people. This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-modal btn-modal-cancel" id="btn-modal-cancel">Cancel</button>
+      <button class="btn-modal btn-modal-confirm" id="btn-modal-confirm">Clear &amp; Reset</button>
+    </div>
+  </div>
+</div>
 
 <div id="copy-toast" class="copy-toast">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
