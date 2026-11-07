@@ -71,15 +71,15 @@ body {
   color: #ffffff;
 }
 .btn-reset {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
+  background: var(--accent2-soft);
+  border: 1px solid var(--accent2-border);
+  color: var(--accent2);
   border-radius: 6px;
   padding: 0.38rem 0.75rem;
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.82rem;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -87,8 +87,8 @@ body {
 }
 .btn-reset:hover {
   color: #ffffff;
-  border-color: var(--border-hover);
-  background: var(--surface-raised);
+  border-color: var(--accent2-border-bright);
+  background: rgba(165, 180, 252, 0.2);
 }
 
 /* ── Unassigned Item Warnings ── */
@@ -1141,6 +1141,29 @@ body {
 
 </div>
 
+<!-- In-App Reset Confirmation Modal -->
+<div class="modal-backdrop" id="reset-modal" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div class="modal-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      </div>
+      <h3 class="modal-title">Reset Current Bill?</h3>
+    </div>
+    <p class="modal-body">This will permanently clear all items, prices, and payment entries recorded for this bill. All inputs will be erased and restored to a clean session.</p>
+    <div class="modal-actions">
+      <button class="btn-modal btn-modal-cancel" id="btn-modal-cancel">Cancel</button>
+      <button class="btn-modal btn-modal-confirm" id="btn-modal-confirm">Reset Bill</button>
+    </div>
+  </div>
+</div>
+
+<!-- Copy Toast Notification -->
+<div id="copy-toast" class="copy-toast">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <span class="toast-text">Copied to clipboard</span>
+</div>
+
 <script>
 (function() {
   var STORAGE_KEY = 'splitbill_state_v2';
@@ -1658,21 +1681,21 @@ body {
 
     if (changeDistributions && changeDistributions.length > 0) {
       lines.push('');
-      lines.push('Restaurant Change (৳ ' + fmt(restaurantChange) + '):');
+      lines.push('Restaurant Change: ৳ ' + fmt(restaurantChange));
       changeDistributions.forEach(function(cd) {
-        lines.push('• ' + cd.name + ' takes ৳ ' + fmt(cd.amount) + ' from table');
+        lines.push('• ' + cd.name + ' collects ৳ ' + fmt(cd.amount) + ' change from the restaurant');
       });
     }
 
     if (transfers && transfers.length > 0) {
       lines.push('');
-      lines.push('Settlement:');
+      lines.push('Settlement Transfers:');
       transfers.forEach(function(t) {
-        lines.push('• ' + t.from + ' pays ৳ ' + fmt(t.amount) + ' to ' + t.to);
+        lines.push('• ' + t.from + ' transfers ৳ ' + fmt(t.amount) + ' to ' + t.to);
       });
     } else if (remainingBill > 0.01) {
       lines.push('');
-      lines.push('Remaining to pay restaurant: ৳ ' + fmt(remainingBill));
+      lines.push('Outstanding Balance to restaurant: ৳ ' + fmt(remainingBill));
     }
 
     lines.push('');
@@ -1749,16 +1772,16 @@ body {
     if (badge) {
       if (!hasPayments) {
         badge.className = 'settlement-badge';
-        badge.textContent = 'Unpaid';
+        badge.textContent = 'Pending Settlement';
       } else if (Math.abs(diff) < 0.01) {
         badge.className = 'settlement-badge paid-full';
-        badge.textContent = 'Exact Paid';
+        badge.textContent = 'Settled';
       } else if (diff > 0.01) {
         badge.className = 'settlement-badge paid-full';
-        badge.textContent = 'Overpaid';
+        badge.textContent = 'Surplus';
       } else {
         badge.className = 'settlement-badge paid-partial';
-        badge.textContent = 'Short by ৳ ' + fmt(remainingBill);
+        badge.textContent = 'Balance Due: ৳ ' + fmt(remainingBill);
       }
     }
 
@@ -1769,7 +1792,7 @@ body {
       if (restaurantChange > 0.01) {
         html += '<div class="settlement-meta-item"><span class="lbl">Restaurant Change</span><span class="val accent-green">৳ ' + fmt(restaurantChange) + '</span></div>';
       } else if (remainingBill > 0.01) {
-        html += '<div class="settlement-meta-item"><span class="lbl">Remaining Bill</span><span class="val accent-warn">৳ ' + fmt(remainingBill) + '</span></div>';
+        html += '<div class="settlement-meta-item"><span class="lbl">Balance Due</span><span class="val accent-warn">৳ ' + fmt(remainingBill) + '</span></div>';
       }
       html += '</div>';
 
@@ -1781,27 +1804,27 @@ body {
         html +=   '</div>';
         html +=   '<div class="settlement-change-list">';
         changeDistributions.forEach(function(cd) {
-          html += '<div>&bull; <strong>' + cd.name + '</strong> takes <strong>৳ ' + fmt(cd.amount) + '</strong> from table</div>';
+          html += '<div>&bull; <strong>' + cd.name + '</strong> collects <strong>৳ ' + fmt(cd.amount) + '</strong> change from the restaurant</div>';
         });
         html +=   '</div>';
         html += '</div>';
       }
 
       if (transfers.length > 0) {
-        html += '<div class="settlement-transfers-title">Suggested Transfers</div>';
+        html += '<div class="settlement-transfers-title">Settlement Transfers</div>';
         html += '<div class="settlement-transfers">';
         transfers.forEach(function(t) {
           html += '<div class="settlement-transfer-item">' +
-                    '<span class="transfer-direction"><strong>' + t.from + '</strong> pays <strong>' + t.to + '</strong></span>' +
+                    '<span class="transfer-direction"><strong>' + t.from + '</strong> &rarr; <strong>' + t.to + '</strong></span>' +
                     '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
                   '</div>';
         });
         html += '</div>';
       } else if (Math.abs(diff) < 0.01 && grandTotal > 0) {
-        html += '<div class="settlement-empty-tip">Everyone paid their exact share directly. No transfers needed!</div>';
+        html += '<div class="settlement-empty-tip">All shares are settled in full. No peer transfers required.</div>';
       }
     } else {
-      html += '<div class="settlement-empty-tip">Enter who paid what above to calculate settlement transfers, or tap below to copy the bill breakdown.</div>';
+      html += '<div class="settlement-empty-tip">Enter amounts paid above to compute net balances and peer transfers, or copy the bill summary directly.</div>';
     }
 
     content.innerHTML = html;
@@ -1941,27 +1964,36 @@ body {
     setTimeout(function() { modal.style.display = 'none'; }, 200);
   }
 
-  document.getElementById('btn-reset').addEventListener('click', openResetModal);
-  document.getElementById('btn-modal-cancel').addEventListener('click', closeResetModal);
+  var resetBtn = document.getElementById('btn-reset');
+  if (resetBtn) resetBtn.addEventListener('click', openResetModal);
 
-  document.getElementById('reset-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeResetModal();
-  });
+  var cancelBtn = document.getElementById('btn-modal-cancel');
+  if (cancelBtn) cancelBtn.addEventListener('click', closeResetModal);
+
+  var modalEl = document.getElementById('reset-modal');
+  if (modalEl) {
+    modalEl.addEventListener('click', function(e) {
+      if (e.target === this) closeResetModal();
+    });
+  }
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeResetModal();
   });
 
-  document.getElementById('btn-modal-confirm').addEventListener('click', function() {
-    closeResetModal();
-    state = getDefaultState();
-    saveState();
-    syncTaxInputs();
-    renderPeople();
-    renderItems();
-    recalculate();
-    showToast('New bill started');
-  });
+  var confirmBtn = document.getElementById('btn-modal-confirm');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function() {
+      closeResetModal();
+      state = getDefaultState();
+      saveState();
+      syncTaxInputs();
+      renderPeople();
+      renderItems();
+      recalculate();
+      showToast('Bill reset');
+    });
+  }
 
   // Init
   syncTaxInputs();
@@ -1980,28 +2012,5 @@ body {
 
 })();
 </script>
-
-<!-- In-App Reset Confirmation Modal -->
-<div class="modal-backdrop" id="reset-modal" style="display: none;">
-  <div class="modal-dialog">
-    <div class="modal-header">
-      <div class="modal-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-      </div>
-      <h3 class="modal-title">Start a New Bill?</h3>
-    </div>
-    <p class="modal-body">This will clear all items, payment entries, and reset to 3 people. This action cannot be undone.</p>
-    <div class="modal-actions">
-      <button class="btn-modal btn-modal-cancel" id="btn-modal-cancel">Cancel</button>
-      <button class="btn-modal btn-modal-confirm" id="btn-modal-confirm">Clear &amp; Reset</button>
-    </div>
-  </div>
-</div>
-
-<div id="copy-toast" class="copy-toast">
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-  <span class="toast-text">Copied to clipboard</span>
-</div>
-
 </body>
 </html>
