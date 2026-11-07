@@ -78,11 +78,11 @@ body {
 }
 .brand-dot {
   position: absolute;
-  top: 0.22em;
+  bottom: 0.51em;
   left: 50%;
   transform: translateX(-50%);
-  width: 0.13em;
-  height: 0.13em;
+  width: 0.12em;
+  height: 0.12em;
   background: var(--accent);
   border-radius: 50%;
 }
@@ -259,8 +259,18 @@ body {
 .item-inputs {
   display: grid;
   grid-template-columns: 1fr 135px 36px;
+  grid-template-areas: "name price del";
   gap: 0.6rem;
   align-items: center;
+}
+.item-name-input {
+  grid-area: name;
+}
+.item-inputs .price-box {
+  grid-area: price;
+}
+.btn-del-item {
+  grid-area: del;
 }
 .input-field {
   background: var(--surface-input);
@@ -587,10 +597,11 @@ body {
 }
 .price-box-sm .currency-symbol {
   font-size: 0.82rem;
-  padding: 0 0.45rem;
+  left: 0.55rem;
+  padding: 0;
 }
 .price-box-sm .input-field {
-  padding: 0.32rem 0.5rem;
+  padding: 0.32rem 0.5rem 0.32rem 1.6rem;
   font-size: 0.85rem;
   height: 32px;
 }
@@ -618,6 +629,32 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1.15rem 1.25rem;
+}
+.settlement-change-card {
+  background: var(--surface-raised);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 6px;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.85rem;
+}
+.settlement-change-header {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #34d399;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+.settlement-change-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.settlement-change-list strong {
+  color: #ffffff;
 }
 .settlement-header {
   display: flex;
@@ -1216,8 +1253,8 @@ body {
       });
 
       inputs.appendChild(nameInput);
-      inputs.appendChild(delBtn);
       inputs.appendChild(priceBox);
+      inputs.appendChild(delBtn);
 
       var sharing = document.createElement('div');
       sharing.className = 'item-sharing';
@@ -1512,7 +1549,7 @@ body {
     return transfers;
   }
 
-  function generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill) {
+  function generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill, changeDistributions) {
     var lines = [];
     lines.push('🧾 SplitBill Summary');
     
@@ -1534,15 +1571,20 @@ body {
       lines.push('• ' + pb.name + ': ৳ ' + fmt(pb.total));
     });
 
+    if (changeDistributions && changeDistributions.length > 0) {
+      lines.push('');
+      lines.push('Restaurant Change (৳ ' + fmt(restaurantChange) + '):');
+      changeDistributions.forEach(function(cd) {
+        lines.push('• ' + cd.name + ' takes ৳ ' + fmt(cd.amount) + ' from table');
+      });
+    }
+
     if (transfers && transfers.length > 0) {
       lines.push('');
       lines.push('Settlement:');
       transfers.forEach(function(t) {
         lines.push('• ' + t.from + ' pays ৳ ' + fmt(t.amount) + ' to ' + t.to);
       });
-      if (restaurantChange > 0.01) {
-        lines.push('• Restaurant Change: ৳ ' + fmt(restaurantChange));
-      }
     } else if (remainingBill > 0.01) {
       lines.push('');
       lines.push('Remaining to pay restaurant: ৳ ' + fmt(remainingBill));
@@ -1565,24 +1607,59 @@ body {
 
     var diff = totalPaid - grandTotal;
     var hasPayments = totalPaid > 0;
+    var restaurantChange = diff > 0.01 ? diff : 0;
+    var remainingBill = diff < -0.01 ? -diff : 0;
 
+    // Change distribution if overpaid
+    var changeDistributions = [];
+    var totalOverpay = 0;
+    if (restaurantChange > 0.01) {
+      var overpayers = [];
+      state.people.forEach(function(p) {
+        var pb = breakdown[p.id];
+        var paid = parseFloat(p.paid) || 0;
+        var over = Math.max(0, paid - pb.total);
+        if (over > 0.005) {
+          overpayers.push({ name: pb.name, overpay: over });
+          totalOverpay += over;
+        }
+      });
+
+      if (totalOverpay > 0.01) {
+        overpayers.forEach(function(op) {
+          var shareOfChange = (restaurantChange * op.overpay) / totalOverpay;
+          changeDistributions.push({
+            name: op.name,
+            amount: shareOfChange
+          });
+        });
+      }
+    }
+
+    // Debtors and Creditors (adjusted for cash change collected from table)
     var debtors = [];
     var creditors = [];
 
     state.people.forEach(function(p) {
       var pb = breakdown[p.id];
       var paid = parseFloat(p.paid) || 0;
-      var net = paid - pb.total;
-      if (net < -0.01) {
-        debtors.push({ id: p.id, name: pb.name, amount: -net });
-      } else if (net > 0.01) {
-        creditors.push({ id: p.id, name: pb.name, amount: net });
+      var changeReceived = 0;
+      if (restaurantChange > 0.01 && totalOverpay > 0.01) {
+        var over = Math.max(0, paid - pb.total);
+        if (over > 0.005) {
+          changeReceived = (restaurantChange * over) / totalOverpay;
+        }
+      }
+
+      var effectiveNet = (paid - changeReceived) - pb.total;
+      if (effectiveNet < -0.01) {
+        debtors.push({ id: p.id, name: pb.name, amount: -effectiveNet });
+      } else if (effectiveNet > 0.01) {
+        creditors.push({ id: p.id, name: pb.name, amount: effectiveNet });
       }
     });
 
     var transfers = computeTransfers(debtors, creditors);
-    var restaurantChange = diff > 0.01 ? diff : 0;
-    var remainingBill = diff < -0.01 ? -diff : 0;
 
     if (badge) {
       if (!hasPayments) {
@@ -1611,6 +1688,20 @@ body {
       }
       html += '</div>';
 
+      if (changeDistributions.length > 0) {
+        html += '<div class="settlement-change-card">';
+        html +=   '<div class="settlement-change-header">';
+        html +=     '<span>Restaurant Change</span>';
+        html +=     '<strong>৳ ' + fmt(restaurantChange) + '</strong>';
+        html +=   '</div>';
+        html +=   '<div class="settlement-change-list">';
+        changeDistributions.forEach(function(cd) {
+          html += '<div>&bull; <strong>' + cd.name + '</strong> takes <strong>৳ ' + fmt(cd.amount) + '</strong> from table</div>';
+        });
+        html +=   '</div>';
+        html += '</div>';
+      }
+
       if (transfers.length > 0) {
         html += '<div class="settlement-transfers-title">Suggested Transfers</div>';
         html += '<div class="settlement-transfers">';
@@ -1633,7 +1724,7 @@ body {
     var copyBtn = document.getElementById('btn-copy-summary');
     if (copyBtn) {
       copyBtn.onclick = function() {
-        var summaryText = generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill);
+        var summaryText = generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill, changeDistributions);
         copyToClipboard(summaryText).then(function() {
           showToast('Summary copied to clipboard!');
         }).catch(function() {
