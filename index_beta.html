@@ -1657,7 +1657,7 @@ body {
     return transfers;
   }
 
-  function generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill, changeDistributions) {
+  function generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill) {
     var lines = [];
     lines.push('🧾 SplitBill Summary');
     
@@ -1679,23 +1679,24 @@ body {
       lines.push('• ' + pb.name + ': ৳ ' + fmt(pb.total));
     });
 
-    if (changeDistributions && changeDistributions.length > 0) {
+    if (restaurantChange > 0.01) {
       lines.push('');
       lines.push('Restaurant Change: ৳ ' + fmt(restaurantChange));
-      changeDistributions.forEach(function(cd) {
-        lines.push('• ' + cd.name + ' collects ৳ ' + fmt(cd.amount) + ' change from the restaurant');
-      });
     }
 
     if (transfers && transfers.length > 0) {
       lines.push('');
-      lines.push('Settlement Transfers:');
+      lines.push('Settlement:');
       transfers.forEach(function(t) {
-        lines.push('• ' + t.from + ' transfers ৳ ' + fmt(t.amount) + ' to ' + t.to);
+        if (t.from === '__restaurant__') {
+          lines.push('• Restaurant gives ' + t.to + ': ৳ ' + fmt(t.amount));
+        } else {
+          lines.push('• ' + t.from + ' pays ' + t.to + ': ৳ ' + fmt(t.amount));
+        }
       });
     } else if (remainingBill > 0.01) {
       lines.push('');
-      lines.push('Outstanding Balance to restaurant: ৳ ' + fmt(remainingBill));
+      lines.push('Outstanding Balance: ৳ ' + fmt(remainingBill));
     }
 
     lines.push('');
@@ -1718,56 +1719,60 @@ body {
     var restaurantChange = diff > 0.01 ? diff : 0;
     var remainingBill = diff < -0.01 ? -diff : 0;
 
-    // Change distribution if overpaid
-    var changeDistributions = [];
-    var totalOverpay = 0;
-    if (restaurantChange > 0.01) {
-      var overpayers = [];
-      state.people.forEach(function(p) {
-        var pb = breakdown[p.id];
-        var paid = parseFloat(p.paid) || 0;
-        var over = Math.max(0, paid - pb.total);
-        if (over > 0.005) {
-          overpayers.push({ name: pb.name, overpay: over });
-          totalOverpay += over;
-        }
-      });
+    // ── UNIFIED MINIMUM-TRANSACTION ALGORITHM ──────────────────────────────
+    // 1. Compute net for each person: net = paid - owed
+    //    positive net  → person is a creditor (gets money back)
+    //    negative net  → person is a debtor (owes money to peers)
+    // 2. If totalPaid > grandTotal the restaurant owes restaurantChange back.
+    //    Model the restaurant as a special DEBTOR of that amount so the greedy
+    //    algorithm routes change through the fewest links possible.
+    // 3. Run greedy pairing: largest debtor → largest creditor each round.
+    // ───────────────────────────────────────────────────────────────────────
 
-      if (totalOverpay > 0.01) {
-        overpayers.forEach(function(op) {
-          var shareOfChange = (restaurantChange * op.overpay) / totalOverpay;
-          changeDistributions.push({
-            name: op.name,
-            amount: shareOfChange
-          });
-        });
-      }
-    }
-
-    // Debtors and Creditors (adjusted for cash change collected from table)
-    var debtors = [];
-    var creditors = [];
+    var nodes = [];   // { name, net, isRestaurant? }
 
     state.people.forEach(function(p) {
       var pb = breakdown[p.id];
       var paid = parseFloat(p.paid) || 0;
-      var changeReceived = 0;
-      if (restaurantChange > 0.01 && totalOverpay > 0.01) {
-        var over = Math.max(0, paid - pb.total);
-        if (over > 0.005) {
-          changeReceived = (restaurantChange * over) / totalOverpay;
-        }
-      }
-
-      var effectiveNet = (paid - changeReceived) - pb.total;
-      if (effectiveNet < -0.01) {
-        debtors.push({ id: p.id, name: pb.name, amount: -effectiveNet });
-      } else if (effectiveNet > 0.01) {
-        creditors.push({ id: p.id, name: pb.name, amount: effectiveNet });
-      }
+      var net = paid - pb.total;   // positive = creditor, negative = debtor
+      nodes.push({ name: pb.name, net: net });
     });
 
-    var transfers = computeTransfers(debtors, creditors);
+    // Restaurant owes the group restaurantChange → model as a debtor
+    if (restaurantChange > 0.01) {
+      nodes.push({ name: '__restaurant__', net: -restaurantChange, isRestaurant: true });
+    }
+
+    var creditors = nodes.filter(function(n) { return n.net >  0.01; })
+                         .sort(function(a,b) { return b.net - a.net; });
+    var debtors   = nodes.filter(function(n) { return n.net < -0.01; })
+                         .map(function(n)    { return { name: n.name, net: -n.net, isRestaurant: !!n.isRestaurant }; })
+                         .sort(function(a,b) { return b.net - a.net; });
+
+    var transfers = [];
+
+    // Greedy pairing loop
+    var ci = 0, di = 0;
+    while (ci < creditors.length && di < debtors.length) {
+      var cred = creditors[ci];
+      var debt = debtors[di];
+      if (cred.net < 0.01) { ci++; continue; }
+      if (debt.net < 0.01) { di++; continue; }
+
+      var payment = Math.min(cred.net, debt.net);
+      transfers.push({
+        from: debt.name,
+        to: cred.name,
+        amount: payment,
+        isRestaurantPayer: debt.isRestaurant   // true when restaurant is paying out change
+      });
+
+      cred.net -= payment;
+      debt.net -= payment;
+
+      if (cred.net < 0.01) ci++;
+      if (debt.net < 0.01) di++;
+    }
 
     if (badge) {
       if (!hasPayments) {
@@ -1796,35 +1801,36 @@ body {
       }
       html += '</div>';
 
-      if (changeDistributions.length > 0) {
-        html += '<div class="settlement-change-card">';
-        html +=   '<div class="settlement-change-header">';
-        html +=     '<span>Restaurant Change</span>';
-        html +=     '<strong>৳ ' + fmt(restaurantChange) + '</strong>';
-        html +=   '</div>';
-        html +=   '<div class="settlement-change-list">';
-        changeDistributions.forEach(function(cd) {
-          html += '<div>&bull; <strong>' + cd.name + '</strong> collects <strong>৳ ' + fmt(cd.amount) + '</strong> change from the restaurant</div>';
-        });
-        html +=   '</div>';
-        html += '</div>';
-      }
-
       if (transfers.length > 0) {
-        html += '<div class="settlement-transfers-title">Settlement Transfers</div>';
+        html += '<div class="settlement-transfers-title">Settlement</div>';
         html += '<div class="settlement-transfers">';
         transfers.forEach(function(t) {
-          html += '<div class="settlement-transfer-item">' +
-                    '<span class="transfer-direction"><strong>' + t.from + '</strong> &rarr; <strong>' + t.to + '</strong></span>' +
-                    '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
-                  '</div>';
+          if (t.to === '__restaurant__') {
+            // Shouldn't normally happen, but guard just in case
+            html += '<div class="settlement-transfer-item">' +
+                      '<span class="transfer-direction"><strong>' + t.from + '</strong> pays <strong>Restaurant</strong></span>' +
+                      '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
+                    '</div>';
+          } else if (t.from === '__restaurant__') {
+            html += '<div class="settlement-transfer-item">' +
+                      '<span class="transfer-direction"><strong>Restaurant</strong> gives <strong>' + t.to + '</strong></span>' +
+                      '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
+                    '</div>';
+          } else {
+            html += '<div class="settlement-transfer-item">' +
+                      '<span class="transfer-direction"><strong>' + t.from + '</strong> pays <strong>' + t.to + '</strong></span>' +
+                      '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
+                    '</div>';
+          }
         });
         html += '</div>';
       } else if (Math.abs(diff) < 0.01 && grandTotal > 0) {
-        html += '<div class="settlement-empty-tip">All shares are settled in full. No peer transfers required.</div>';
+        html += '<div class="settlement-empty-tip">All shares are settled in full. No transfers required.</div>';
+      } else if (restaurantChange > 0.01) {
+        html += '<div class="settlement-empty-tip">Restaurant owes ৳ ' + fmt(restaurantChange) + ' change — collect it at the table.</div>';
       }
     } else {
-      html += '<div class="settlement-empty-tip">Enter amounts paid above to compute net balances and peer transfers, or copy the bill summary directly.</div>';
+      html += '<div class="settlement-empty-tip">Enter amounts paid above to compute net balances and transfers, or copy the bill summary directly.</div>';
     }
 
     content.innerHTML = html;
@@ -1832,7 +1838,7 @@ body {
     var copyBtn = document.getElementById('btn-copy-summary');
     if (copyBtn) {
       copyBtn.onclick = function() {
-        var summaryText = generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill, changeDistributions);
+        var summaryText = generateWhatsAppSummary(breakdown, grandTotal, foodSubtotal, totalVat, totalSd, transfers, restaurantChange, remainingBill);
         copyToClipboard(summaryText).then(function() {
           showToast('Summary copied to clipboard!');
         }).catch(function() {
@@ -1875,7 +1881,7 @@ body {
         var details = document.createElement('div');
         details.className = 'res-card-breakdown';
         details.innerHTML = 
-          '<div class="breakdown-row"><span>Food Share:</span><span class="val-food">৳ ' + fmt(pb.foodShare) + '</span></div>' +
+          '<div class="breakdown-row"><span>Food:</span><span class="val-food">৳ ' + fmt(pb.foodShare) + '</span></div>' +
           '<div class="breakdown-row"><span>VAT:</span><span class="val-vat">৳ ' + fmt(pb.vatShare) + '</span></div>' +
           '<div class="breakdown-row"><span>SD:</span><span class="val-sd">৳ ' + fmt(pb.sdShare) + '</span></div>';
 
