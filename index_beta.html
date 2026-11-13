@@ -1753,15 +1753,22 @@ body {
     }
 
     if (transfers && transfers.length > 0) {
-      lines.push('');
-      lines.push('Settlement:');
-      transfers.forEach(function(t) {
-        if (t.from === '__restaurant__') {
-          lines.push('• Restaurant gives ' + t.to + ': ৳ ' + fmt(t.amount));
-        } else {
+      var restaurantPayoutsCopy = transfers.filter(function(t) { return t.isRestaurantPayer; });
+      var peerTransfersCopy     = transfers.filter(function(t) { return !t.isRestaurantPayer; });
+
+      if (restaurantPayoutsCopy.length > 0) {
+        restaurantPayoutsCopy.forEach(function(t) {
+          lines.push('• ' + t.to + ' collects ৳ ' + fmt(t.amount) + ' from the restaurant');
+        });
+      }
+
+      if (peerTransfersCopy.length > 0) {
+        lines.push('');
+        lines.push('Settlement Transfers:');
+        peerTransfersCopy.forEach(function(t) {
           lines.push('• ' + t.from + ' pays ' + t.to + ': ৳ ' + fmt(t.amount));
-        }
-      });
+        });
+      }
     } else if (remainingBill > 0.01) {
       lines.push('');
       lines.push('Outstanding Balance: ৳ ' + fmt(remainingBill));
@@ -1860,6 +1867,10 @@ body {
 
     var html = '';
     if (hasPayments) {
+      // Split transfers into restaurant payouts vs peer transfers
+      var restaurantPayouts = transfers.filter(function(t) { return t.isRestaurantPayer; });
+      var peerTransfers     = transfers.filter(function(t) { return !t.isRestaurantPayer; });
+
       html += '<div class="settlement-meta-grid">';
       html +=   '<div class="settlement-meta-item"><span class="lbl">Total Paid</span><span class="val">৳ ' + fmt(totalPaid) + '</span></div>';
       if (restaurantChange > 0.01) {
@@ -1869,33 +1880,41 @@ body {
       }
       html += '</div>';
 
-      if (transfers.length > 0) {
-        html += '<div class="settlement-transfers-title">Settlement</div>';
+      // Restaurant Change card — who collects what from the restaurant
+      if (restaurantChange > 0.01) {
+        html += '<div class="settlement-change-card">';
+        html +=   '<div class="settlement-change-header">';
+        html +=     '<span>Restaurant Change</span>';
+        html +=     '<strong>৳ ' + fmt(restaurantChange) + '</strong>';
+        html +=   '</div>';
+        html +=   '<div class="settlement-change-list">';
+        if (restaurantPayouts.length > 0) {
+          restaurantPayouts.forEach(function(t) {
+            html += '<div>&bull; <strong>' + t.to + '</strong> collects <strong>৳ ' + fmt(t.amount) + '</strong> from the restaurant</div>';
+          });
+        } else {
+          // Change fully absorbed into peer transfers — show as a note
+          html += '<div>Change absorbed into peer settlements below</div>';
+        }
+        html +=   '</div>';
+        html += '</div>';
+      }
+
+      // Peer transfers
+      if (peerTransfers.length > 0) {
+        html += '<div class="settlement-transfers-title">Settlement Transfers</div>';
         html += '<div class="settlement-transfers">';
-        transfers.forEach(function(t) {
-          if (t.to === '__restaurant__') {
-            // Shouldn't normally happen, but guard just in case
-            html += '<div class="settlement-transfer-item">' +
-                      '<span class="transfer-direction"><strong>' + t.from + '</strong> pays <strong>Restaurant</strong></span>' +
-                      '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
-                    '</div>';
-          } else if (t.from === '__restaurant__') {
-            html += '<div class="settlement-transfer-item">' +
-                      '<span class="transfer-direction"><strong>Restaurant</strong> gives <strong>' + t.to + '</strong></span>' +
-                      '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
-                    '</div>';
-          } else {
-            html += '<div class="settlement-transfer-item">' +
-                      '<span class="transfer-direction"><strong>' + t.from + '</strong> pays <strong>' + t.to + '</strong></span>' +
-                      '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
-                    '</div>';
-          }
+        peerTransfers.forEach(function(t) {
+          html += '<div class="settlement-transfer-item">' +
+                    '<span class="transfer-direction"><strong>' + t.from + '</strong> pays <strong>' + t.to + '</strong></span>' +
+                    '<span class="transfer-amount">৳ ' + fmt(t.amount) + '</span>' +
+                  '</div>';
         });
         html += '</div>';
-      } else if (Math.abs(diff) < 0.01 && grandTotal > 0) {
+      } else if (transfers.length === 0 && Math.abs(diff) < 0.01 && grandTotal > 0) {
         html += '<div class="settlement-empty-tip">All shares are settled in full. No transfers required.</div>';
-      } else if (restaurantChange > 0.01) {
-        html += '<div class="settlement-empty-tip">Restaurant owes ৳ ' + fmt(restaurantChange) + ' change — collect it at the table.</div>';
+      } else if (transfers.length === 0 && restaurantChange < 0.01) {
+        // No transfers at all, not fully settled
       }
     } else {
       html += '<div class="settlement-empty-tip">Enter amounts paid above to compute net balances and transfers, or copy the bill summary directly.</div>';
