@@ -1,4 +1,4 @@
-const CACHE_NAME = 'splitbill-cache-v7';
+const CACHE_NAME = 'splitbill-cache-v8';
 const ASSETS = [
   './',
   './index.html',

@@ -95,6 +95,28 @@ body {
 .item-row.unassigned {
   border-color: rgba(245, 158, 11, 0.45);
 }
+.item-row.highlight-pulse {
+  animation: itemHighlightPulse 2s ease-out;
+}
+@keyframes itemHighlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.85);
+    border-color: #f59e0b;
+  }
+  35% {
+    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0.3);
+    border-color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.08);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(245, 158, 11, 0);
+    border-color: #f59e0b;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    border-color: rgba(245, 158, 11, 0.45);
+  }
+}
 .unassigned-tag {
   display: inline-flex;
   align-items: center;
@@ -106,15 +128,69 @@ body {
 }
 .summary-warning-bar {
   background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.28);
   border-radius: 6px;
-  padding: 0.65rem 0.95rem;
+  padding: 0.75rem 0.95rem;
   margin-bottom: 1.15rem;
   font-size: 0.82rem;
   color: #fcd34d;
   display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.summary-warning-header {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+.summary-warning-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding-left: 1.35rem;
+}
+.btn-orphan-jump {
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fef3c7;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 500;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+.btn-orphan-jump:hover {
+  background: rgba(245, 158, 11, 0.26);
+  border-color: rgba(245, 158, 11, 0.75);
+  transform: translateY(-1px);
+}
+.btn-orphan-jump:active {
+  transform: translateY(0);
+}
+.orphan-badge-items {
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.orphan-badge-items:hover {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.7);
 }
 
 /* ── Sections ── */
@@ -131,6 +207,9 @@ body {
 }
 .section-header {
   margin-bottom: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .section-title {
   font-family: var(--font-serif);
@@ -797,6 +876,69 @@ body {
   opacity: 1;
 }
 
+/* ── Floating Jump-to-Summary Button ── */
+.btn-floating-summary {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 950;
+  background: rgba(14, 14, 16, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(165, 180, 252, 0.4);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.15s, border-color 0.15s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.btn-floating-summary:hover {
+  background: rgba(24, 24, 28, 0.98);
+  border-color: var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.85);
+}
+.btn-floating-summary:active {
+  transform: translateY(0);
+}
+.btn-floating-summary .jump-label {
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+.btn-floating-summary .jump-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+}
+.btn-floating-summary .jump-total {
+  color: var(--accent2);
+  font-weight: 700;
+}
+.btn-floating-summary svg {
+  color: var(--accent2);
+  transition: transform 0.2s ease;
+}
+.btn-floating-summary:hover svg {
+  transform: translateY(2px);
+}
+.btn-floating-summary.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+}
+
 /* ── In-App Modal Dialog ── */
 .modal-backdrop {
   position: fixed;
@@ -996,6 +1138,12 @@ body {
     padding: 0.65rem 1rem;
     font-size: 0.9rem;
   }
+  .btn-floating-summary {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.48rem 0.8rem;
+    font-size: 0.78rem;
+  }
 }
 
 /* ── BETA DEBUG BAR (NEVER SHIP TO index.html) ── */
@@ -1113,7 +1261,7 @@ body {
     </button>
   </div>
   <div class="debug-right">
-    <span class="debug-badge">v7-beta</span>
+    <span class="debug-badge">v8-beta</span>
   </div>
 </div>
 
@@ -1139,9 +1287,10 @@ body {
   </section>
 
   <!-- Section 2: Items -->
-  <section class="section">
+  <section class="section" id="items-section">
     <div class="section-header">
       <h2 class="section-title">Items</h2>
+      <div id="items-orphan-container"></div>
     </div>
     
     <div class="items-table" id="items-container">
@@ -1202,7 +1351,7 @@ body {
   </section>
 
   <!-- Section 4: Summary — cards only, no view switcher -->
-  <section class="summary-section">
+  <section class="summary-section" id="summary-section">
     <div class="summary-top">
       <h2 class="summary-title">Summary</h2>
     </div>
@@ -1257,7 +1406,13 @@ body {
 
 </div>
 
-<!-- In-App Reset Confirmation Modal -->
+<!-- Floating Jump to Summary Button -->
+<button class="btn-floating-summary" id="btn-jump-summary" title="Jump to Summary">
+  <span class="jump-label">Summary</span>
+  <span class="jump-dot"></span>
+  <span class="jump-total" id="jump-summary-total">৳ 0.00</span>
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+</button>
 <div class="modal-backdrop" id="reset-modal" style="display: none;">
   <div class="modal-dialog">
     <div class="modal-header">
@@ -1405,6 +1560,25 @@ body {
   }
 
   /* ── ITEMS ── */
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function scrollToItem(itemId) {
+    var el = document.getElementById('item-row-' + itemId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('highlight-pulse');
+    setTimeout(function() {
+      el.classList.remove('highlight-pulse');
+    }, 2000);
+  }
+
   function updateItemWarning(row, item) {
     var isUnassigned = (parseFloat(item.price) || 0) > 0 && item.splitWith.length === 0;
     row.classList.toggle('unassigned', isUnassigned);
@@ -1429,6 +1603,8 @@ body {
       var isUnassigned = (parseFloat(item.price) || 0) > 0 && item.splitWith.length === 0;
       var row = document.createElement('div');
       row.className = 'item-row' + (isUnassigned ? ' unassigned' : '');
+      row.id = 'item-row-' + item.id;
+      row.setAttribute('data-item-id', item.id);
 
       var inputs = document.createElement('div');
       inputs.className = 'item-inputs';
@@ -1628,7 +1804,7 @@ body {
   function recalculate() {
     var foodSubtotal = 0;
     var personBreakdown = {};
-    var unassignedCount = 0;
+    var unassignedItems = [];
 
     state.people.forEach(function(p) {
       personBreakdown[p.id] = {
@@ -1645,7 +1821,7 @@ body {
       foodSubtotal += itemPrice;
 
       if (itemPrice > 0 && item.splitWith.length === 0) {
-        unassignedCount++;
+        unassignedItems.push(item);
       }
 
       if (item.splitWith.length > 0 && itemPrice > 0) {
@@ -1687,6 +1863,11 @@ body {
     document.getElementById('sum-sd').textContent       = '৳ ' + fmt(totalSd);
     document.getElementById('sum-grand').textContent    = '৳ ' + fmt(grandTotal);
 
+    var jumpTotalEl = document.getElementById('jump-summary-total');
+    if (jumpTotalEl) {
+      jumpTotalEl.textContent = '৳ ' + fmt(grandTotal);
+    }
+
     if (state.tax.vat.mode === 'pct') {
       document.getElementById('vat-computed-text').textContent = '৳ ' + fmt(totalVat);
     }
@@ -1694,15 +1875,62 @@ body {
       document.getElementById('sd-computed-text').textContent = '৳ ' + fmt(totalSd);
     }
 
-    // Subtle Warning in Summary
+    // Items Section Orphan Badge
+    var itemsOrphanContainer = document.getElementById('items-orphan-container');
+    if (itemsOrphanContainer) {
+      if (unassignedItems.length > 0) {
+        var count = unassignedItems.length;
+        var badgeText = count === 1 ? '1 unassigned' : count + ' unassigned';
+        itemsOrphanContainer.innerHTML = '<button type="button" class="orphan-badge-items" id="btn-orphan-badge-jump" title="Jump to unassigned item">' +
+          '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="7"/><line x1="8" y1="4.5" x2="8" y2="8.5"/><circle cx="8" cy="11.5" r="0.6" fill="currentColor"/></svg>' +
+          '<span>' + badgeText + '</span>' +
+          '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>' +
+        '</button>';
+        var badgeBtn = document.getElementById('btn-orphan-badge-jump');
+        if (badgeBtn) {
+          badgeBtn.addEventListener('click', function() {
+            scrollToItem(unassignedItems[0].id);
+          });
+        }
+      } else {
+        itemsOrphanContainer.innerHTML = '';
+      }
+    }
+
+    // Subtle Warning in Summary with Direct Auto-Scroll Actions
     var warnContainer = document.getElementById('summary-warning-container');
     if (warnContainer) {
-      if (unassignedCount > 0) {
-        var itemWord = unassignedCount === 1 ? '1 item is' : (unassignedCount + ' items are');
-        warnContainer.innerHTML = '<div class="summary-warning-bar">' +
-          '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><line x1="8" y1="4.5" x2="8" y2="8.5"/><circle cx="8" cy="11.5" r="0.6" fill="currentColor"/></svg>' +
-          '<span><strong>Notice</strong> &mdash; ' + itemWord + ' unassigned and not included in anyone\'s share.</span>' +
-        '</div>';
+      if (unassignedItems.length > 0) {
+        var count = unassignedItems.length;
+        var headerText = count === 1
+          ? '1 item is unassigned and not included in anyone\'s share &mdash; tap to locate:'
+          : count + ' items are unassigned and not included in anyone\'s share &mdash; tap to locate:';
+
+        var html = '<div class="summary-warning-bar">' +
+          '<div class="summary-warning-header">' +
+            '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><line x1="8" y1="4.5" x2="8" y2="8.5"/><circle cx="8" cy="11.5" r="0.6" fill="currentColor"/></svg>' +
+            '<span><strong>Notice</strong> &mdash; ' + headerText + '</span>' +
+          '</div>' +
+          '<div class="summary-warning-items">';
+
+        unassignedItems.forEach(function(it) {
+          var label = (it.name && it.name.trim().length > 0) ? it.name : 'Unnamed Item';
+          html += '<button type="button" class="btn-orphan-jump" data-target-id="' + it.id + '" title="Scroll to ' + escapeHtml(label) + '">' +
+                    '<span>' + escapeHtml(label) + '</span>' +
+                    '<span style="opacity:0.75;">(৳ ' + fmt(it.price) + ')</span>' +
+                    '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>' +
+                  '</button>';
+        });
+
+        html += '</div></div>';
+        warnContainer.innerHTML = html;
+
+        warnContainer.querySelectorAll('.btn-orphan-jump').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var targetId = this.getAttribute('data-target-id');
+            scrollToItem(targetId);
+          });
+        });
       } else {
         warnContainer.innerHTML = '';
       }
@@ -2141,6 +2369,37 @@ body {
   renderPeople();
   renderItems();
   recalculate();
+
+  // Floating Jump to Summary Button Logic
+  var jumpBtn = document.getElementById('btn-jump-summary');
+  if (jumpBtn) {
+    jumpBtn.addEventListener('click', function() {
+      var summarySec = document.getElementById('summary-section');
+      if (summarySec) {
+        summarySec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
+
+  function updateJumpSummaryVisibility() {
+    var summarySec = document.getElementById('summary-section');
+    var btn = document.getElementById('btn-jump-summary');
+    if (!summarySec || !btn) return;
+
+    var rect = summarySec.getBoundingClientRect();
+    // When summary section is visible on screen, smoothly hide the floating jump button
+    var isAtSummary = rect.top <= (window.innerHeight * 0.72);
+
+    if (isAtSummary) {
+      btn.classList.add('hidden');
+    } else {
+      btn.classList.remove('hidden');
+    }
+  }
+
+  window.addEventListener('scroll', updateJumpSummaryVisibility, { passive: true });
+  window.addEventListener('resize', updateJumpSummaryVisibility, { passive: true });
+  updateJumpSummaryVisibility();
 
   // Register Service Worker for offline capability
   if ('serviceWorker' in navigator) {
