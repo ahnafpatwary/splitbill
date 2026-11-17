@@ -1,4 +1,4 @@
-const CACHE_NAME = 'splitbill-cache-v6';
+const CACHE_NAME = 'splitbill-cache-v7';
 const ASSETS = [
   './',
   './index.html',
@@ -25,13 +25,34 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Navigation / HTML requests: Network-First
+  // Ensures updates are fetched immediately while online, falling back to cache when offline.
+  if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cached) => {
+            return cached || caches.match('./index.html') || caches.match('./index_beta.html');
+          });
+        })
+    );
+    return;
+  }
+
+  // Static assets (favicon, fonts, etc.): Cache-First
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {
-        // Dynamically cache Google Fonts if loaded
         if (event.request.url.includes('fonts.gstatic.com') || event.request.url.includes('fonts.googleapis.com')) {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -39,10 +60,6 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return networkResponse;
-      }).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('./') || caches.match('./index.html') || caches.match('./index_beta.html');
-        }
       });
     })
   );
