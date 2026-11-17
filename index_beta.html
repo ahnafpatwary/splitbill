@@ -1300,7 +1300,7 @@ body {
     </button>
   </div>
   <div class="debug-right">
-    <span class="debug-badge">v9-beta</span>
+    <span class="debug-badge">v10-beta</span>
   </div>
 </div>
 
@@ -1655,6 +1655,7 @@ body {
       nameInput.value = item.name || '';
       nameInput.addEventListener('input', function() {
         item.name = this.value;
+        recalculate();
         saveState();
       });
 
@@ -1941,8 +1942,8 @@ body {
       if (unassignedItems.length > 0) {
         var count = unassignedItems.length;
         var headerText = count === 1
-          ? '1 item remains unassigned and excluded from balances:'
-          : count + ' items remain unassigned and excluded from balances:';
+          ? '1 item remains unassigned and excluded from totals:'
+          : count + ' items remain unassigned and excluded from totals:';
 
         var html = '<div class="summary-warning-bar">' +
           '<div class="summary-warning-header">' +
